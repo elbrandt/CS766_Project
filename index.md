@@ -4,12 +4,12 @@ Asher Elmquist, Eric Brandt
 
 ## Proposal
 
-Todo.
+Todo: Due Feb 14, 2020
 
 ## Mid-Project Report
 
-Todo.
+Todo: Due Mar 25, 2020
 
 ## Final Report
 
-Todo.
+Todo: Due May 4, 2020
