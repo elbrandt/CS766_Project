@@ -4,6 +4,12 @@ Asher Elmquist, Eric Brandt
 
 ## Proposal
 
+Todo.
+
 ## Mid-Project Report
 
+Todo.
+
 ## Final Report
+
+Todo.
