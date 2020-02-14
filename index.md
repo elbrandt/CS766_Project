@@ -1,6 +1,8 @@
-# UW Madison CS766: Computer Vision, Spring 2020
+# Super Resolution Image Enhancement
+## UW Madison CS766 - Computer Vision, Spring 2020
 
-Asher Elmquist (```amelmquist@wisc.edu```) 
+Asher Elmquist (```amelmquist@wisc.edu```)
+ 
 Eric Brandt (```elbrandt@wisc.edu```)
 
 ## Proposal
