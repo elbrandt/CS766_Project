@@ -1,3 +1,8 @@
+#
+# Retrieves image files for UW Madison CS766 Project, Mar 2020
+# Eric Brandt, Asher Elmquist
+#
+#
 import sys
 import csv
 import os
