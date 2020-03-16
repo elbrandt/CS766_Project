@@ -18,9 +18,11 @@ class SRNet():
         self.h=image_shape[1]
         self.w=image_shape[2]
 
+        self.up = 1
+
         # self.gen_A2B = GeneratorUNet(f=gen_layer_factor)
         # self.gen_B2A = GeneratorUNet(f=gen_layer_factor)
-        self.net = SRResNet(f=8,up=2)
+        self.net = SRResNet(f=8,up=self.up)
 
         #load weights from file if we are to continue from previous training
         if self.continue_from_save:
@@ -33,6 +35,9 @@ class SRNet():
         #put the networks on the gpu
         self.net.to(device)
 
+    def grow(self):
+        self.net.grow_net()
+        self.up += 1
 
     def train(self,data_loader,num_epochs=2,batch_size=1,num_samples=-1,lr=1e-4,print_interval=10,save_interval=1,img_progress_interval=-1):
         self.data_loader = data_loader
@@ -108,7 +113,7 @@ class SRNet():
                     ax[2].imshow(img_high.detach().cpu().numpy().transpose((0, 2, 3, 1))[0,:,:,:]*.5+.5)
                     ax[2].set_title('Real High Res')
 
-                    plt.savefig("progress/progress_"+str(e)+"_"+str(i)+".png")
+                    plt.savefig("progress/progress_"+str(self.up)+"_"+str(e)+"_"+str(i)+".png")
                     plt.close(f)
 
             #save when needed
@@ -125,9 +130,9 @@ class SRNet():
 
     def save(self):
         if torch.cuda.device_count() > 1:
-            self.net.module.save("saved_models/gen_A2B")
+            self.net.module.save("saved_models/net")
         else:
-            self.net.save("saved_models/gen_A2B")
+            self.net.save("saved_models/net")
 
     def export(self):
         pass
@@ -135,7 +140,7 @@ class SRNet():
 
 
 class SRResNet(nn.Module):
-    def __init__(self,f=4,up=2):
+    def __init__(self,f=4,up=1):    #upscale in 2**up
         super(SRResNet,self).__init__()
 
         self.f = f
@@ -154,14 +159,19 @@ class SRResNet(nn.Module):
         self.conv1_3 = nn.Conv2d(in_channels=8*f,out_channels=8*f,kernel_size=3,stride=1,padding=1)
         self.in1_3 = nn.InstanceNorm2d(8*f)
 
-        #downsample block
-        self.conv2_1 = nn.Conv2d(in_channels=8*f,out_channels=8*f,kernel_size=3,stride=1,padding=1)
-        self.in2_1 = nn.InstanceNorm2d(8*f)
-        self.conv2_2 = nn.Conv2d(in_channels=8*f,out_channels=8*f,kernel_size=3,stride=1,padding=1)
-        self.in2_2 = nn.InstanceNorm2d(8*f)
-        self.conv2_3 = nn.Conv2d(in_channels=8*f,out_channels=32*f,kernel_size=3,stride=1,padding=1)
-        self.in2_3 = nn.InstanceNorm2d(32*f)
-        self.shuffle = nn.PixelShuffle(2)
+        #upsampling
+        self.blocks = nn.ModuleList()
+        for i in range(self.up):
+            self.conv2_1 = nn.Conv2d(in_channels=8*f,out_channels=8*f,kernel_size=3,stride=1,padding=1)
+            self.in2_1 = nn.InstanceNorm2d(8*f)
+            self.conv2_2 = nn.Conv2d(in_channels=8*f,out_channels=8*f,kernel_size=3,stride=1,padding=1)
+            self.in2_2 = nn.InstanceNorm2d(8*f)
+            self.conv2_3 = nn.Conv2d(in_channels=8*f,out_channels=8*f,kernel_size=3,stride=1,padding=1)
+            self.in2_3 = nn.InstanceNorm2d(8*f)
+            self.conv2_4 = nn.Conv2d(in_channels=8*f,out_channels=32*f,kernel_size=3,stride=1,padding=1)
+            self.in2_4 = nn.InstanceNorm2d(32*f)
+            self.shuffle = nn.PixelShuffle(2)
+            self.blocks.append(nn.ModuleList([self.conv2_1,self.in2_1,self.conv2_2,self.in2_2,self.conv2_3,self.in2_3,self.conv2_4,self.in2_4,self.shuffle]))
 
 
         #finishing block for CNN
@@ -179,10 +189,19 @@ class SRResNet(nn.Module):
         x = self.relu(self.in1_2(self.conv1_2(x)))
         x = self.relu(self.in1_3(self.conv1_3(x)))
 
-        x = self.relu(self.in2_1(self.conv2_1(x)))
-        x = self.relu(self.in2_2(self.conv2_2(x)))
-        x = self.relu(self.in2_3(self.conv2_3(x)))
-        x = self.shuffle(x)
+        for i in range(len(self.blocks)):
+            x_save = x
+            for j in range(0,6):
+                x = (self.blocks[i][j])(x)
+
+            x = torch.add(x,x_save)
+            for j in range(6,9):
+                x = (self.blocks[i][j])(x)
+
+            # x = self.relu(self.in2_1(self.conv2_1(x)))
+            # x = self.relu(self.in2_2(self.conv2_2(x)))
+            # x = self.relu(self.in2_3(self.conv2_3(x)))
+            # x = self.shuffle(x)
 
         x = self.relu(self.in_out_1(self.conv_out_1(x)))
         x = self.relu(self.in_out_2(self.conv_out_2(x)))
@@ -190,14 +209,28 @@ class SRResNet(nn.Module):
 
         return x
 
+    def grow_net(self):
+        self.prev_up = self.up
+        self.up += 1
+
+        for i in range(self.prev_up,len(self.blocks)):
+            init.orthogonal_((self.blocks[i][0]).weight, init.calculate_gain('relu'))
+            init.orthogonal_(self.blocks[i][2].weight, init.calculate_gain('relu'))
+            init.orthogonal_(self.blocks[i][4].weight, init.calculate_gain('relu'))
+
     def init_weights(self):
         init.orthogonal_(self.conv1_1.weight, init.calculate_gain('relu'))
         init.orthogonal_(self.conv1_2.weight, init.calculate_gain('relu'))
         init.orthogonal_(self.conv1_3.weight, init.calculate_gain('relu'))
 
-        init.orthogonal_(self.conv2_1.weight, init.calculate_gain('relu'))
-        init.orthogonal_(self.conv2_2.weight, init.calculate_gain('relu'))
-        init.orthogonal_(self.conv2_3.weight, init.calculate_gain('relu'))
+        for i in range(len(self.blocks)):
+            init.orthogonal_((self.blocks[i][0]).weight, init.calculate_gain('relu'))
+            init.orthogonal_(self.blocks[i][2].weight, init.calculate_gain('relu'))
+            init.orthogonal_(self.blocks[i][4].weight, init.calculate_gain('relu'))
+
+        # init.orthogonal_(self.conv2_1.weight, init.calculate_gain('relu'))
+        # init.orthogonal_(self.conv2_2.weight, init.calculate_gain('relu'))
+        # init.orthogonal_(self.conv2_3.weight, init.calculate_gain('relu'))
 
         init.orthogonal_(self.conv_out_1.weight, init.calculate_gain('relu'))
         init.orthogonal_(self.conv_out_2.weight, init.calculate_gain('relu'))

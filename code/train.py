@@ -9,15 +9,15 @@ import time
 from models import *
 from loaders import *
 
-num_epochs      = 1000
-batch_size      = 32
+num_epochs      = 5
+batch_size      = 8
 num_samples     = 24000
 lr              = 1e-3
 device          = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 image_shape     = (4,480,640)
 print_interval  = 1    #in terms of batches
 save_interval   = 1    #in terms of epochs
-img_progress_interval   = 50    #in terms of batches
+img_progress_interval = 100    #in terms of batches
 
 continue_from_save = False
 
@@ -33,15 +33,49 @@ if __name__ == "__main__":
     # domain_A_dir = "/srv/home/amelmquist/datasets/hall/synthetic/train/"
     # domain_B_dir = "/srv/home/amelmquist/datasets/hall/real/train/"
 
-    small_dir = "/home/amelmquist/datasets/sr/Buildings/64/"
-    large_dir = "/home/amelmquist/datasets/sr/Buildings/128/"
+    dir_64 = "/home/amelmquist/datasets/sr/Buildings/64/"
+    dir_128 = "/home/amelmquist/datasets/sr/Buildings/128/"
+    dir_256 = "/home/amelmquist/datasets/sr/Buildings/256/"
+    dir_512 = "/home/amelmquist/datasets/sr/Buildings/512/"
 
-    data_JIT_loader = Img2ImgJITLoader(small_dir,large_dir,paired_samples=True,num_samples=num_samples,file_type=".jpg")
-    data_loader = torch.utils.data.DataLoader(data_JIT_loader, batch_size=batch_size,shuffle=True,num_workers=4)
 
     #intialize the super resolution network
     model = SRNet(image_shape=image_shape,device=device,continue_from_save=continue_from_save)
 
+    data_JIT_loader = Img2ImgJITLoader(dir_64,dir_128,paired_samples=True,num_samples=num_samples,file_type=".jpg")
+    data_loader = torch.utils.data.DataLoader(data_JIT_loader, batch_size=batch_size,shuffle=True,num_workers=4)
+    batch_size = batch_size
+    model.train(data_loader,num_epochs=num_epochs,batch_size=batch_size,num_samples=num_samples,lr=lr,print_interval=print_interval,save_interval=save_interval,img_progress_interval=img_progress_interval)
+
+    batch_size = int(batch_size / 2)
+    data_JIT_loader = Img2ImgJITLoader(dir_128,dir_256,paired_samples=True,num_samples=num_samples,file_type=".jpg")
+    data_loader = torch.utils.data.DataLoader(data_JIT_loader, batch_size=batch_size,shuffle=True,num_workers=4)
+    model.grow()
+    model.train(data_loader,num_epochs=num_epochs,batch_size=batch_size,num_samples=num_samples,lr=lr,print_interval=print_interval,save_interval=save_interval,img_progress_interval=img_progress_interval)
+
+    batch_size = int(batch_size / 2)
+    data_JIT_loader = Img2ImgJITLoader(dir_256,dir_512,paired_samples=True,num_samples=num_samples,file_type=".jpg")
+    data_loader = torch.utils.data.DataLoader(data_JIT_loader, batch_size=batch_size,shuffle=True,num_workers=4)
+    model.grow()
     model.train(data_loader,num_epochs=num_epochs,batch_size=batch_size,num_samples=num_samples,lr=lr,print_interval=print_interval,save_interval=save_interval,img_progress_interval=img_progress_interval)
 
     model.save()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#
