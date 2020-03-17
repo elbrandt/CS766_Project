@@ -19,10 +19,11 @@ class SRNet():
         self.w=image_shape[2]
 
         self.up = 1
+        self.max_up = 5 #how far will we want to go? 2**n = 2048 ==> n=5
 
         # self.gen_A2B = GeneratorUNet(f=gen_layer_factor)
         # self.gen_B2A = GeneratorUNet(f=gen_layer_factor)
-        self.net = SRResNet(f=8,up=self.up)
+        self.net = SRResNet(f=4,up=self.up,max_up=self.max_up)
 
         #load weights from file if we are to continue from previous training
         if self.continue_from_save:
@@ -140,7 +141,7 @@ class SRNet():
 
 
 class SRResNet(nn.Module):
-    def __init__(self,f=4,up=1):    #upscale in 2**up
+    def __init__(self,f=4,up=1,max_up=5):    #upscale in 2**up
         super(SRResNet,self).__init__()
 
         self.f = f
@@ -161,7 +162,7 @@ class SRResNet(nn.Module):
 
         #upsampling
         self.blocks = nn.ModuleList()
-        for i in range(self.up):
+        for i in range(max_up):
             self.conv2_1 = nn.Conv2d(in_channels=8*f,out_channels=8*f,kernel_size=3,stride=1,padding=1)
             self.in2_1 = nn.InstanceNorm2d(8*f)
             self.conv2_2 = nn.Conv2d(in_channels=8*f,out_channels=8*f,kernel_size=3,stride=1,padding=1)
@@ -189,7 +190,7 @@ class SRResNet(nn.Module):
         x = self.relu(self.in1_2(self.conv1_2(x)))
         x = self.relu(self.in1_3(self.conv1_3(x)))
 
-        for i in range(len(self.blocks)):
+        for i in range(self.up):
             x_save = x
             for j in range(0,6):
                 x = (self.blocks[i][j])(x)
@@ -213,7 +214,7 @@ class SRResNet(nn.Module):
         self.prev_up = self.up
         self.up += 1
 
-        for i in range(self.prev_up,len(self.blocks)):
+        for i in range(self.prev_up,self.up):
             init.orthogonal_((self.blocks[i][0]).weight, init.calculate_gain('relu'))
             init.orthogonal_(self.blocks[i][2].weight, init.calculate_gain('relu'))
             init.orthogonal_(self.blocks[i][4].weight, init.calculate_gain('relu'))
@@ -223,7 +224,7 @@ class SRResNet(nn.Module):
         init.orthogonal_(self.conv1_2.weight, init.calculate_gain('relu'))
         init.orthogonal_(self.conv1_3.weight, init.calculate_gain('relu'))
 
-        for i in range(len(self.blocks)):
+        for i in range(self.up):
             init.orthogonal_((self.blocks[i][0]).weight, init.calculate_gain('relu'))
             init.orthogonal_(self.blocks[i][2].weight, init.calculate_gain('relu'))
             init.orthogonal_(self.blocks[i][4].weight, init.calculate_gain('relu'))
