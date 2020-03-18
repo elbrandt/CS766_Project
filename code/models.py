@@ -23,7 +23,7 @@ class SRNet():
 
         # self.gen_A2B = GeneratorUNet(f=gen_layer_factor)
         # self.gen_B2A = GeneratorUNet(f=gen_layer_factor)
-        self.net = SRResNet(f=4,up=self.up,max_up=self.max_up)
+        self.net = SRResNet(f=8,up=self.up,max_up=self.max_up)
 
         #load weights from file if we are to continue from previous training
         if self.continue_from_save:
@@ -54,7 +54,8 @@ class SRNet():
         #initialize optimizers
         self.opt = optim.Adam(self.net.parameters(), lr=lr)
         # self.loss_function = nn.L1Loss()
-        self.loss_function = nn.MSELoss()
+        # self.loss_function = nn.MSELoss()
+        self.loss_function = nn.L1Loss()
 
         #training loop
         t0 = time.time()

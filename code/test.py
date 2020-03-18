@@ -10,7 +10,7 @@ from models import *
 from loaders import *
 
 batch_size      = 1
-num_samples     = -1
+num_samples     = 100
 # lr              = 1e-4
 device          = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 image_shape     = (4,480,640)
@@ -28,37 +28,37 @@ if __name__ == "__main__":
     # domain_A_dir = "/media/amelmquist/easystore/datasets/sidd/256_noise_test/"
     # domain_B_dir = "/media/amelmquist/easystore/datasets/sidd/256_noise_test/"
 
-    domain_A_dir = "/home/amelmquist/datasets/hall/synthetic/test/"
-    domain_B_dir = "/home/amelmquist/datasets/hall/real/test/"
+    dir_64 = "/home/amelmquist/datasets/sr/Buildings/64/"
+    dir_128 = "/home/amelmquist/datasets/sr/Buildings/128/"
+    dir_256 = "/home/amelmquist/datasets/sr/Buildings/256/"
+    dir_512 = "/home/amelmquist/datasets/sr/Buildings/512/"
 
-    data_JIT_loader = Img2ImgJITLoader(domain_A_dir,domain_B_dir,paired_samples=False,num_samples=num_samples)
+
+    data_JIT_loader = Img2ImgJITLoader(dir_64,dir_512,paired_samples=True,num_samples=num_samples,file_type=".jpg")
     data_loader = torch.utils.data.DataLoader(data_JIT_loader, batch_size=batch_size,shuffle=True,num_workers=4)
 
     #intialize the GAN
-    model = CyclePatchGAN(image_shape=image_shape,device=device,continue_from_save=False)
-    model.load()
+    model = SRNet(image_shape=image_shape,device=device,continue_from_save=True)
+    # model.load()
 
     for i,data in enumerate(data_loader, 0):
-        real_A,real_B = data
-        real_A = real_A.to(device)
-        real_B = real_B.to(device)
+        low_res,high_res = data
+        low_res = low_res.to(device)
+        start = time.time()
+        prediction = model.test(low_res)
+        end = time.time()
+        print("Inference in:",end-start,"seconds")
 
-        fake_a, fake_b, pred_real_a, pred_fake_a, pred_real_b, pred_fake_b = model.test(real_A, real_B)
+        f, ax = plt.subplots(1,3)
+        ax[0].imshow(low_res.detach().cpu().numpy().transpose((0, 2, 3, 1))[0,:,:,:]*.5+.5)
+        ax[0].set_title('Low Resolution')
 
-        print("D(real_a)=%.3f | D(fake_a)=%.3f | D(real_b)=%.3f | D(fake_b)=%.3f" % (pred_real_a, pred_fake_a, pred_real_b, pred_fake_b))
+        ax[1].imshow(prediction.detach().cpu().numpy().transpose((0, 2, 3, 1))[0,:,:,:]*.5+.5)
+        ax[1].set_title('SR Prediction')
 
-        f, ax = plt.subplots(2,2)
-        ax[0,0].imshow(real_A.detach().cpu().numpy().transpose((0, 2, 3, 1))[0,:,:,:]*.5+.5)
-        ax[0,0].set_title('Real A')
+        ax[2].imshow(high_res.detach().cpu().numpy().transpose((0, 2, 3, 1))[0,:,:,:]*.5+.5)
+        ax[2].set_title('High Resolution')
 
-        ax[0,1].imshow(fake_a.detach().cpu().numpy().transpose((0, 2, 3, 1))[0,:,:,:]*.5+.5)
-        ax[0,1].set_title('Fake A')
-
-        ax[1,0].imshow(fake_b.detach().cpu().numpy().transpose((0, 2, 3, 1))[0,:,:,:]*.5+.5)
-        ax[1,0].set_title('Fake B')
-
-        ax[1,1].imshow(real_B.detach().cpu().numpy().transpose((0, 2, 3, 1))[0,:,:,:]*.5+.5)
-        ax[1,1].set_title('Real B')
 
         plt.show()
 
