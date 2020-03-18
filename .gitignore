@@ -1,0 +1,7 @@
+code/saved_models/
+code/progress*
+
+dataset/Retriever/downloads/
+dataset/Retriever/resized/
+
+*.pyc

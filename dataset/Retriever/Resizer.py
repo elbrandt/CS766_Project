@@ -54,7 +54,7 @@ def resize_file(fname, outdir):
         if g_startFromFullEachTime:
             down_img = crop_img.copy()
 
-        
+
 def main():
     """main function"""
 
@@ -70,17 +70,19 @@ def main():
     print("Found {} files".format(len(fils)))
 
     cnt = 1
+    start_cnt = 1
     errors = []
     for fil in fils:
-        outdir = os.path.dirname(fil);
-        outdir = outdir.replace(f_downloadLocation, f_resizeLocation)
-        print("Processing ({}/{}) {}=>{}".format(cnt, len(fils), fil, outdir))
-        try:
-            resize_file(fil, outdir)
-        except Exception as ex:
-            # store the errors in a list, to make it easier to see how things finished
-            errors.append((fil, ex))
-            print(f" error: {ex}") 
+        if cnt > start_cnt:
+            outdir = os.path.dirname(fil);
+            outdir = outdir.replace(f_downloadLocation, f_resizeLocation)
+            print("Processing ({}/{}) {}=>{}".format(cnt, len(fils), fil, outdir))
+            try:
+                resize_file(fil, outdir)
+            except Exception as ex:
+                # store the errors in a list, to make it easier to see how things finished
+                errors.append((fil, ex))
+                print(f" error: {ex}")
         cnt = cnt + 1
 
     # print out the list of errors at the end
