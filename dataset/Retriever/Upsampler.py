@@ -1,16 +1,18 @@
 #
-# Resizes image files for UW Madison CS766 Project, Mar 2020
+# Upsamples image files for UW Madison CS766 Project, Mar 2020
 # Eric Brandt, Asher Elmquist
 #
 #
 import os
 import cv2
+import glob
 
 # Global settings
-f_downloadLocation = "downloads"
-f_resizeLocation = "resized"
-g_sizes = [2048, 1024, 512, 256, 128, 64]
-g_startFromFullEachTime = True;
+f_sourceLocation = "resized"
+f_resizeLocation = "upsampled"
+g_startSize = 64
+g_endSize = 512
+g_oneShotUpsize = True; # true=? start->end in one rescale, false=>rescale x2 repeatedly
 
 
 def ensure_dir_exists(fname):
@@ -18,7 +20,7 @@ def ensure_dir_exists(fname):
     if not os.path.exists(dirname):
         os.makedirs(dirname)
 
-def downsample(img, sz):
+def upsample(img, sz):
     out_img = cv2.resize(img, (sz, sz))
     return out_img
 
@@ -29,30 +31,22 @@ def save_img(fname, img):
     else:
         print(f" skipping writing {fname}. File already exists")
 
-
 def resize_file(fname, outdir):
     img = cv2.imread(fname)
-    if img.shape[0] < g_sizes[0] or img.shape[1] < g_sizes[0] or not img.shape[2] == 3:
-        raise Exception(f"image dimension less than {g_sizes[0]} too small ({img.shape})")
+    if img.shape[0] != g_startSize or img.shape[1] != g_startSize or img.shape[2] != 3:
+        raise Exception(f"image dimension {img.shape[0]}x{img.shape[1]} is not {g_startSize}x{g_startSize}")
 
-    # center crop to biggest size, square
-    y = int((img.shape[0] - g_sizes[0]) / 2)
-    x = int((img.shape[1] - g_sizes[0]) / 2)
-    crop_img = img[y:y+g_sizes[0], x:x+g_sizes[0]]
-    out_fname = os.path.join(outdir, str(g_sizes[0]), os.path.basename(fname))
-    save_img(out_fname, crop_img)
-
-    if g_startFromFullEachTime:
-        down_img = crop_img.copy()
+    if g_oneShotUpsize:
+        up_img = upsample(img, g_endSize)
     else:
-        down_img = crop_img
+        sz = g_startSize
+        up_img = img;
+        while sz < g_endSize:
+            sz = sz * 2
+            up_img = upsample(up_img, sz)
 
-    for sz in g_sizes[1:]:
-        down_img = downsample(down_img, sz)
-        out_fname = os.path.join(outdir, str(sz), os.path.basename(fname))
-        save_img(out_fname, down_img)
-        if g_startFromFullEachTime:
-            down_img = crop_img.copy()
+    out_fname = os.path.join(outdir, os.path.basename(fname))
+    save_img(out_fname, up_img)
 
         
 def main():
@@ -62,18 +56,16 @@ def main():
         os.makedirs(f_resizeLocation)
 
     # make a list of all the files to be processed.
-    fils = []
-    for root, dirs, files in os.walk(f_downloadLocation, topdown = False):
-       for in_fname in files:
-           if not os.path.basename(in_fname) == "_pending.jpg":
-               fils.append(os.path.join(root, in_fname))
+    sourceLoc = "{}/**/{}/*.jpg".format(f_sourceLocation, g_startSize)
+    fils = glob.glob(sourceLoc)
     print("Found {} files".format(len(fils)))
 
     cnt = 1
     errors = []
     for fil in fils:
         outdir = os.path.dirname(fil);
-        outdir = outdir.replace(f_downloadLocation, f_resizeLocation)
+        outdir = outdir.replace(f_sourceLocation, f_resizeLocation)
+        outdir = outdir.replace(str(g_startSize), "{}-{}".format(g_startSize, g_endSize))
         print("Processing ({}/{}) {}=>{}".format(cnt, len(fils), fil, outdir))
         try:
             resize_file(fil, outdir)
