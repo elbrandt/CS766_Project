@@ -6,11 +6,11 @@
 import os
 import cv2
 
-# Filenames
+# Global settings
 f_downloadLocation = "downloads"
 f_resizeLocation = "resized"
 g_sizes = [2048, 1024, 512, 256, 128, 64]
-g_startFromFullEachTime = False;
+g_startFromFullEachTime = True;
 
 
 def ensure_dir_exists(fname):
@@ -87,7 +87,7 @@ def main():
 
     # print out the list of errors at the end
     cnt = 1
-    print(f"{len(errors)} occurred.")
+    print(f"{len(errors)} errors occurred.")
     for err in errors:
         print(f"Error {cnt}: ({err[0]}) {err[1]}")
         cnt = cnt + 1
