@@ -193,12 +193,21 @@ class SRResNet(nn.Module):
 
         for i in range(self.up):
             x_save = x
-            for j in range(0,6):
-                x = (self.blocks[i][j])(x)
+
+            x = self.relu(self.blocks[i][1](self.blocks[i][0](x)))
+            x = self.relu(self.blocks[i][3](self.blocks[i][2](x)))
+            x = self.relu(self.blocks[i][5](self.blocks[i][4](x)))
 
             x = torch.add(x,x_save)
-            for j in range(6,9):
-                x = (self.blocks[i][j])(x)
+
+            x = self.relu(self.blocks[i][7](self.blocks[i][6](x)))
+            x = self.blocks[i][8](x)
+            #for j in range(0,6):
+            #    x = (self.blocks[i][j])(x)
+
+            #x = torch.add(x,x_save)
+            #for j in range(6,9):
+            #    x = (self.blocks[i][j])(x)
 
             # x = self.relu(self.in2_1(self.conv2_1(x)))
             # x = self.relu(self.in2_2(self.conv2_2(x)))
