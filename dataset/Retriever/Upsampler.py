@@ -8,8 +8,8 @@ import cv2
 import glob
 
 # Global settings
-f_sourceLocation = "resized"
-f_resizeLocation = "upsampled"
+f_sourceLocation = "/home/amelmquist/datasets/sr"
+f_resizeLocation = "/home/amelmquist/datasets/sr/upsampled"
 g_startSize = 64
 g_endSize = 512
 g_oneShotUpsize = True; # true=? start->end in one rescale, false=>rescale x2 repeatedly
@@ -48,7 +48,7 @@ def resize_file(fname, outdir):
     out_fname = os.path.join(outdir, os.path.basename(fname))
     save_img(out_fname, up_img)
 
-        
+
 def main():
     """main function"""
 
@@ -72,7 +72,7 @@ def main():
         except Exception as ex:
             # store the errors in a list, to make it easier to see how things finished
             errors.append((fil, ex))
-            print(f" error: {ex}") 
+            print(f" error: {ex}")
         cnt = cnt + 1
 
     # print out the list of errors at the end
