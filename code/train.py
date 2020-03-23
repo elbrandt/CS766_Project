@@ -33,10 +33,10 @@ if __name__ == "__main__":
     # domain_A_dir = "/srv/home/amelmquist/datasets/hall/synthetic/train/"
     # domain_B_dir = "/srv/home/amelmquist/datasets/hall/real/train/"
 
-    dir_64 = "/home/amelmquist/datasets/sr/Buildings/64/"
-    dir_128 = "/home/amelmquist/datasets/sr/Buildings/128/"
-    dir_256 = "/home/amelmquist/datasets/sr/Buildings/256/"
-    dir_512 = "/home/amelmquist/datasets/sr/Buildings/512/"
+    dir_64 = "/home/asher/datasets/sr/Building/64/"
+    dir_128 = "/home/asher/datasets/sr/Building/128/"
+    dir_256 = "/home/asher/datasets/sr/Building/256/"
+    dir_512 = "/home/asher/datasets/sr/Building/512/"
 
 
     #intialize the super resolution network
