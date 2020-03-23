@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.init as init
 import torch.optim as optim
 import numpy as np
-import torchvision
+# import torchvision
 import matplotlib.pyplot as plt
 import time
 

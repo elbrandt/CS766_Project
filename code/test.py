@@ -39,10 +39,10 @@ if __name__ == "__main__":
     data_loader = torch.utils.data.DataLoader(data_JIT_loader, batch_size=batch_size,shuffle=True,num_workers=4)
 
     #intialize the GAN
-    model = SRNet(image_shape=image_shape,device=device,continue_from_save=True)
+    model = SRNet(image_shape=image_shape,device=device,continue_from_save=False)
     model.grow()
     model.grow()
-    # model.load()
+    model.load()
 
     for i,data in enumerate(data_loader, 0):
         low_res,high_res,upsampled = data
@@ -52,7 +52,7 @@ if __name__ == "__main__":
         end = time.time()
         print("Inference in:",end-start,"seconds")
 
-        f, ax = plt.subplots(1,4)
+        f, ax = plt.subplots(1,4,figsize=(12,4))
         ax[0].imshow(low_res.detach().cpu().numpy().transpose((0, 2, 3, 1))[0,:,:,:]*.5+.5)
         ax[0].set_title('Low Resolution')
 
@@ -68,8 +68,12 @@ if __name__ == "__main__":
         ax[3].set_title('High Resolution')
 
 
-        plt.show()
+        # plt.show()
+        plt.savefig("results/test_img_"+str(i)+".png")
+        plt.close()
 
+        if(i>10):
+            break
 
 
 
