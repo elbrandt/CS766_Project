@@ -2,7 +2,6 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import numpy as np
-# import torchvision
 import matplotlib.pyplot as plt
 import time
 
@@ -46,6 +45,8 @@ if __name__ == "__main__":
 
     for i,data in enumerate(data_loader, 0):
         low_res,high_res,upsampled = data
+        img_noise = torch.from_numpy(np.random.uniform(-1,1,low_res.shape).astype(np.float32))
+        low_res = torch.cat([low_res,img_noise],1)
         low_res = low_res.to(device)
         start = time.time()
         prediction = model.test(low_res)

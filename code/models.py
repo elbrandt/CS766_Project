@@ -3,7 +3,6 @@ import torch.nn as nn
 import torch.nn.init as init
 import torch.optim as optim
 import numpy as np
-# import torchvision
 import matplotlib.pyplot as plt
 import time
 
@@ -68,6 +67,10 @@ class SRNet():
                 num_steps += 1
                 #grab some real samples
                 img_low,img_high = data
+
+                img_noise = torch.from_numpy(np.random.uniform(-1,1,img_low.shape).astype(np.float32))
+
+                img_low = torch.cat([img_low,img_noise],1)
                 img_low = img_low.to(self.device)
                 img_high = img_high.to(self.device)
 
@@ -100,10 +103,12 @@ class SRNet():
                     img_low,img_high = next(iter(data_loader))
                     #grab some real samples
                     img_low,img_high = data
-                    img_low = img_low.to(self.device)
+                    img_noise = torch.from_numpy(np.random.uniform(-1,1,img_low.shape).astype(np.float32))
+                    img_low_cat = torch.cat([img_low,img_noise],1)
+                    img_low_cat = img_low_cat.to(self.device)
                     img_high = img_high.to(self.device)
 
-                    pred_img_high = self.test(img_low)
+                    pred_img_high = self.test(img_low_cat)
 
                     f, ax = plt.subplots(1,3)
                     ax[0].imshow(img_low.detach().cpu().numpy().transpose((0, 2, 3, 1))[0,:,:,:]*.5+.5)
@@ -154,7 +159,7 @@ class SRResNet(nn.Module):
 
         #layers
         #expanding input block for image
-        self.conv1_1 = nn.Conv2d(in_channels=3,out_channels=4*f,kernel_size=3,stride=1,padding=1)
+        self.conv1_1 = nn.Conv2d(in_channels=6,out_channels=4*f,kernel_size=3,stride=1,padding=1)
         self.in1_1 = nn.InstanceNorm2d(4*f)
         self.conv1_2 = nn.Conv2d(in_channels=4*f,out_channels=8*f,kernel_size=3,stride=1,padding=1)
         self.in1_2 = nn.InstanceNorm2d(8*f)

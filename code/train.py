@@ -2,22 +2,21 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import numpy as np
-import torchvision
 import matplotlib.pyplot as plt
 import time
 
 from models import *
 from loaders import *
 
-num_epochs      = 256
-batch_size      = 16
+num_epochs      = 64
+batch_size      = 8
 num_samples     = 24000
 lr              = 1e-3
 device          = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 image_shape     = (4,480,640)
-print_interval  = 1    #in terms of batches
+print_interval  = 10    #in terms of batches
 save_interval   = 1    #in terms of epochs
-img_progress_interval = 50    #in terms of batches
+img_progress_interval = 100    #in terms of batches
 
 continue_from_save = False
 
@@ -33,10 +32,10 @@ if __name__ == "__main__":
     # domain_A_dir = "/srv/home/amelmquist/datasets/hall/synthetic/train/"
     # domain_B_dir = "/srv/home/amelmquist/datasets/hall/real/train/"
 
-    dir_64 = "/home/asher/datasets/sr/Building/64/"
-    dir_128 = "/home/asher/datasets/sr/Building/128/"
-    dir_256 = "/home/asher/datasets/sr/Building/256/"
-    dir_512 = "/home/asher/datasets/sr/Building/512/"
+    dir_64 = "/home/amelmquist/datasets/sr/Buildings/64/"
+    dir_128 = "/home/amelmquist/datasets/sr/Buildings/128/"
+    dir_256 = "/home/amelmquist/datasets/sr/Buildings/256/"
+    dir_512 = "/home/amelmquist/datasets/sr/Buildings/512/"
 
 
     #intialize the super resolution network
