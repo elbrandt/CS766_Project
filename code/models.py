@@ -18,11 +18,11 @@ class SRNet():
         self.w=image_shape[2]
 
         self.up = 1
-        self.max_up = 5 #how far will we want to go? 2**n = 2048 ==> n=5
+        self.max_up = 3 #how far will we want to go? 2**n = 2048 ==> n=5
 
         # self.gen_A2B = GeneratorUNet(f=gen_layer_factor)
         # self.gen_B2A = GeneratorUNet(f=gen_layer_factor)
-        self.net = SRResNet(f=8,up=self.up,max_up=self.max_up)
+        self.net = SRResNet(f=4,up=self.up,max_up=self.max_up)
 
         #load weights from file if we are to continue from previous training
         if self.continue_from_save:
@@ -54,7 +54,8 @@ class SRNet():
         self.opt = optim.Adam(self.net.parameters(), lr=lr)
         # self.loss_function = nn.L1Loss()
         # self.loss_function = nn.MSELoss()
-        self.loss_function = nn.L1Loss()
+        # self.loss_function = nn.L1Loss()
+        self.loss_function = nn.MSELoss()
 
         #training loop
         t0 = time.time()
@@ -68,16 +69,21 @@ class SRNet():
                 #grab some real samples
                 img_low,img_high = data
 
-                img_noise = torch.from_numpy(np.random.uniform(-1,1,img_low.shape).astype(np.float32))
+                img_inputs = [img_low.to(self.device)]
+                for u in range(1,self.up+1):
+                    u_f = 2**u
+                    img_inputs.append(torch.from_numpy(np.random.uniform(-1,1,(img_low.shape[0],1,img_low.shape[3]*u_f,img_low.shape[3]*u_f)).astype(np.float32)).to(self.device))
 
-                img_low = torch.cat([img_low,img_noise],1)
-                img_low = img_low.to(self.device)
+                    # print("Len:",len(img_inputs))
+                # print(img_inputs)
+                # img_low = torch.cat([img_low,img_noise],1)
+                # img_low = img_low.to(self.device)
                 img_high = img_high.to(self.device)
 
                 #zero the gradients
                 self.opt.zero_grad()
                 #make prediction
-                pred_high = self.net(img_low)
+                pred_high = self.net(img_inputs)
                 #propagate loss
                 loss = self.loss_function(pred_high,img_high)
                 loss.backward()
@@ -103,12 +109,17 @@ class SRNet():
                     img_low,img_high = next(iter(data_loader))
                     #grab some real samples
                     img_low,img_high = data
-                    img_noise = torch.from_numpy(np.random.uniform(-1,1,img_low.shape).astype(np.float32))
-                    img_low_cat = torch.cat([img_low,img_noise],1)
-                    img_low_cat = img_low_cat.to(self.device)
+                    img_inputs = [img_low.to(self.device)]
+                    for u in range(1,self.up+1):
+                        u_f = 2**u
+                        img_inputs.append(torch.from_numpy(np.random.uniform(-1,1,(img_low.shape[0],1,img_low.shape[3]*u_f,img_low.shape[3]*u_f)).astype(np.float32)).to(self.device))
+
+                    # img_noise = torch.from_numpy(np.random.uniform(-1,1,img_low.shape).astype(np.float32))
+                    # img_low_cat = torch.cat([img_low,img_noise],1)
+                    # img_low_cat = img_low_cat.to(self.device)
                     img_high = img_high.to(self.device)
 
-                    pred_img_high = self.test(img_low_cat)
+                    pred_img_high = self.test(img_inputs)
 
                     f, ax = plt.subplots(1,3)
                     ax[0].imshow(img_low.detach().cpu().numpy().transpose((0, 2, 3, 1))[0,:,:,:]*.5+.5)
@@ -128,8 +139,8 @@ class SRNet():
                 self.save()
                 self.export()
 
-    def test(self,img):
-        sr_img = self.net(img)
+    def test(self,inputs):
+        sr_img = self.net(inputs)
         return sr_img
 
     def load(self):
@@ -159,54 +170,66 @@ class SRResNet(nn.Module):
 
         #layers
         #expanding input block for image
-        self.conv1_1 = nn.Conv2d(in_channels=6,out_channels=4*f,kernel_size=3,stride=1,padding=1)
+        self.conv1_1 = nn.Conv2d(in_channels=3,out_channels=4*f,kernel_size=3,stride=1,padding=1)
         self.in1_1 = nn.InstanceNorm2d(4*f)
         self.conv1_2 = nn.Conv2d(in_channels=4*f,out_channels=8*f,kernel_size=3,stride=1,padding=1)
         self.in1_2 = nn.InstanceNorm2d(8*f)
-        self.conv1_3 = nn.Conv2d(in_channels=8*f,out_channels=8*f,kernel_size=3,stride=1,padding=1)
-        self.in1_3 = nn.InstanceNorm2d(8*f)
+        self.conv1_3 = nn.Conv2d(in_channels=8*f,out_channels=8*f+1,kernel_size=3,stride=1,padding=1)
+        self.in1_3 = nn.InstanceNorm2d(8*f+1)
 
         #upsampling
         self.blocks = nn.ModuleList()
         for i in range(max_up):
-            self.conv2_1 = nn.Conv2d(in_channels=8*f,out_channels=8*f,kernel_size=3,stride=1,padding=1)
-            self.in2_1 = nn.InstanceNorm2d(8*f)
-            self.conv2_2 = nn.Conv2d(in_channels=8*f,out_channels=8*f,kernel_size=3,stride=1,padding=1)
-            self.in2_2 = nn.InstanceNorm2d(8*f)
-            self.conv2_3 = nn.Conv2d(in_channels=8*f,out_channels=8*f,kernel_size=3,stride=1,padding=1)
-            self.in2_3 = nn.InstanceNorm2d(8*f)
-            self.conv2_4 = nn.Conv2d(in_channels=8*f,out_channels=32*f,kernel_size=3,stride=1,padding=1)
-            self.in2_4 = nn.InstanceNorm2d(32*f)
+            self.conv2_1 = nn.Conv2d(in_channels=8*f+1,out_channels=16*f,kernel_size=5,stride=1,padding=2)
+            self.in2_1 = nn.InstanceNorm2d(16*f)
+            self.conv2_2 = nn.Conv2d(in_channels=16*f,out_channels=16*f,kernel_size=3,stride=1,padding=1)
+            self.in2_2 = nn.InstanceNorm2d(16*f)
+            self.conv2_3 = nn.Conv2d(in_channels=16*f,out_channels=16*f,kernel_size=3,stride=1,padding=1)
+            self.in2_3 = nn.InstanceNorm2d(16*f)
+            self.conv2_4 = nn.Conv2d(in_channels=16*f,out_channels=16*f,kernel_size=3,stride=1,padding=1)
+            self.in2_4 = nn.InstanceNorm2d(16*f)
+            self.conv2_5 = nn.Conv2d(in_channels=16*f,out_channels=32*f,kernel_size=3,stride=1,padding=1)
+            self.in2_5 = nn.InstanceNorm2d(32*f)
             self.shuffle = nn.PixelShuffle(2)
-            self.blocks.append(nn.ModuleList([self.conv2_1,self.in2_1,self.conv2_2,self.in2_2,self.conv2_3,self.in2_3,self.conv2_4,self.in2_4,self.shuffle]))
+            self.blocks.append(nn.ModuleList([self.conv2_1,self.in2_1,self.conv2_2,self.in2_2,self.conv2_3,self.in2_3,self.conv2_4,self.in2_4,self.conv2_5,self.in2_5,self.shuffle]))
 
 
         #finishing block for CNN
-        self.conv_out_1 = nn.Conv2d(in_channels=8*f,out_channels=8*f,kernel_size=5,stride=1,padding=2)
+        self.conv_out_1 = nn.Conv2d(in_channels=8*f+1,out_channels=8*f,kernel_size=5,stride=1,padding=2)
         self.in_out_1 = nn.InstanceNorm2d(8*f)
         self.conv_out_2 = nn.Conv2d(in_channels=8*f,out_channels=8*f,kernel_size=3,stride=1,padding=1)
         self.in_out_2 = nn.InstanceNorm2d(8*f)
-        self.conv_out_3 = nn.Conv2d(in_channels=8*f,out_channels=3,kernel_size=3,stride=1,padding=1)
+        self.conv_out_3 = nn.Conv2d(in_channels=8*f,out_channels=8*f,kernel_size=3,stride=1,padding=1)
+        self.in_out_3 = nn.InstanceNorm2d(8*f)
+        self.conv_out_4 = nn.Conv2d(in_channels=8*f,out_channels=3,kernel_size=3,stride=1,padding=1)
 
         #initialize weights
         self.init_weights()
 
     def forward(self,x):
+        inputs = x
+        x = inputs[0]
         x = self.relu(self.conv1_1(x))
         x = self.relu(self.in1_2(self.conv1_2(x)))
         x = self.relu(self.in1_3(self.conv1_3(x)))
 
         for i in range(self.up):
-            x_save = x
-
+            #one layer to handle noise concatenation
             x = self.relu(self.blocks[i][1](self.blocks[i][0](x)))
+
+            #ResNet Block
+            x_save = x
             x = self.relu(self.blocks[i][3](self.blocks[i][2](x)))
             x = self.relu(self.blocks[i][5](self.blocks[i][4](x)))
-
+            x = self.relu(self.blocks[i][7](self.blocks[i][6](x)))
             x = torch.add(x,x_save)
 
-            x = self.relu(self.blocks[i][7](self.blocks[i][6](x)))
-            x = self.blocks[i][8](x)
+            #upscaling layer
+            x = self.relu(self.blocks[i][9](self.blocks[i][8](x)))
+            x = self.blocks[i][10](x)
+
+            #noise introcuction for details at next higher resolution
+            x = torch.cat([x,inputs[i+1]],1)
             #for j in range(0,6):
             #    x = (self.blocks[i][j])(x)
 
@@ -221,7 +244,8 @@ class SRResNet(nn.Module):
 
         x = self.relu(self.in_out_1(self.conv_out_1(x)))
         x = self.relu(self.in_out_2(self.conv_out_2(x)))
-        x = self.tanh(self.conv_out_3(x))
+        x = self.relu(self.in_out_3(self.conv_out_3(x)))
+        x = self.tanh(self.conv_out_4(x))
 
         return x
 
@@ -243,6 +267,7 @@ class SRResNet(nn.Module):
             init.orthogonal_((self.blocks[i][0]).weight, init.calculate_gain('relu'))
             init.orthogonal_(self.blocks[i][2].weight, init.calculate_gain('relu'))
             init.orthogonal_(self.blocks[i][4].weight, init.calculate_gain('relu'))
+            init.orthogonal_(self.blocks[i][6].weight, init.calculate_gain('relu'))
 
         # init.orthogonal_(self.conv2_1.weight, init.calculate_gain('relu'))
         # init.orthogonal_(self.conv2_2.weight, init.calculate_gain('relu'))
@@ -250,7 +275,8 @@ class SRResNet(nn.Module):
 
         init.orthogonal_(self.conv_out_1.weight, init.calculate_gain('relu'))
         init.orthogonal_(self.conv_out_2.weight, init.calculate_gain('relu'))
-        init.orthogonal_(self.conv_out_3.weight, init.calculate_gain('tanh'))
+        init.orthogonal_(self.conv_out_3.weight, init.calculate_gain('relu'))
+        init.orthogonal_(self.conv_out_4.weight, init.calculate_gain('tanh'))
         # init.orthogonal_(self.conv9_4.weight, init.calculate_gain('tanh'))
 
     def save(self,path):

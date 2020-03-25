@@ -45,11 +45,14 @@ if __name__ == "__main__":
 
     for i,data in enumerate(data_loader, 0):
         low_res,high_res,upsampled = data
-        img_noise = torch.from_numpy(np.random.uniform(-1,1,low_res.shape).astype(np.float32))
-        low_res = torch.cat([low_res,img_noise],1)
-        low_res = low_res.to(device)
+        img_inputs = [low_res.to(device)]
+        for u in range(1,4):
+            u_f = 2**u
+            img_inputs.append(torch.from_numpy(np.random.uniform(-1,1,(low_res.shape[0],1,low_res.shape[3]*u_f,low_res.shape[3]*u_f)).astype(np.float32)).to(device))
+
+        # low_res = low_res.to(device)
         start = time.time()
-        prediction = model.test(low_res)
+        prediction = model.test(img_inputs)
         end = time.time()
         print("Inference in:",end-start,"seconds")
 
@@ -69,8 +72,8 @@ if __name__ == "__main__":
         ax[3].set_title('High Resolution')
 
 
-        # plt.show()
-        plt.savefig("results/test_img_"+str(i)+".png")
+        plt.show()
+        # plt.savefig("results/test_img_"+str(i)+".png")
         plt.close()
 
         if(i>10):
