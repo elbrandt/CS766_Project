@@ -5,7 +5,50 @@ import torch.optim as optim
 import numpy as np
 import matplotlib.pyplot as plt
 import time
+from torchvision import models
 
+# class VGG_OUTPUT(object):
+#
+#     def __init__(self, relu1_2, relu2_2, relu3_3, relu4_3):
+#         self.__dict__ = locals()
+
+
+class VGG16(torch.nn.Module):
+    def __init__(self, requires_grad=False):
+        super(VGG16, self).__init__()
+        vgg_pretrained_features = models.vgg16(pretrained=True).features
+        self.slice1 = torch.nn.Sequential()
+        self.slice2 = torch.nn.Sequential()
+        self.slice3 = torch.nn.Sequential()
+        self.slice4 = torch.nn.Sequential()
+        for x in range(4):
+            self.slice1.add_module(str(x), vgg_pretrained_features[x])
+        for x in range(4, 9):
+            self.slice2.add_module(str(x), vgg_pretrained_features[x])
+        for x in range(9, 16):
+            self.slice3.add_module(str(x), vgg_pretrained_features[x])
+        for x in range(16, 23):
+            self.slice4.add_module(str(x), vgg_pretrained_features[x])
+        if not requires_grad:
+            for param in self.parameters():
+                param.requires_grad = False
+
+        self.slice1 = self.slice1.cuda()
+        self.slice2 = self.slice2.cuda()
+        self.slice3 = self.slice3.cuda()
+        self.slice4 = self.slice4.cuda()
+
+    def forward(self, X):
+        h = self.slice1(X)
+        h_relu1_2 = h
+        h = self.slice2(h)
+        h_relu2_2 = h
+        h = self.slice3(h)
+        h_relu3_3 = h
+        h = self.slice4(h)
+        h_relu4_3 = h
+        # return VGG_OUTPUT(h_relu1_2, h_relu2_2, h_relu3_3, h_relu4_3)
+        return h_relu4_3
 
 ################3
 # Cycle GAN created for image to image translation of 4,480,640
@@ -56,6 +99,7 @@ class SRNet():
         # self.loss_function = nn.MSELoss()
         # self.loss_function = nn.L1Loss()
         self.loss_function = nn.MSELoss()
+        self.loss_net = VGG16()
 
         #training loop
         t0 = time.time()
@@ -86,6 +130,7 @@ class SRNet():
                 pred_high = self.net(img_inputs)
                 #propagate loss
                 loss = self.loss_function(pred_high,img_high)
+                loss += torch.mean(torch.abs(self.loss_net(pred_high) -  self.loss_net(img_high)))
                 loss.backward()
                 loss_sum += loss.item()
                 #step the optimizer

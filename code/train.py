@@ -8,15 +8,15 @@ import time
 from models import *
 from loaders import *
 
-num_epochs      = 256
+num_epochs      = 10
 batch_size      = 8
-num_samples     = 24000
+num_samples     = 100
 lr              = 1e-3
 device          = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 image_shape     = (4,480,640)
 print_interval  = 1    #in terms of batches
 save_interval   = 1    #in terms of epochs
-img_progress_interval = 100    #in terms of batches
+img_progress_interval = 1    #in terms of batches
 
 continue_from_save = False
 
@@ -40,7 +40,7 @@ if __name__ == "__main__":
 
     #intialize the super resolution network
     model = SRNet(image_shape=image_shape,device=device,continue_from_save=continue_from_save)
-
+    #
     data_JIT_loader = Img2ImgJITLoader(dir_64,dir_128,paired_samples=True,num_samples=num_samples,file_type=".jpg")
     data_loader = torch.utils.data.DataLoader(data_JIT_loader, batch_size=batch_size,shuffle=True,num_workers=4)
     batch_size = batch_size

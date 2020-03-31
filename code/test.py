@@ -9,7 +9,7 @@ from models import *
 from loaders import *
 
 batch_size      = 1
-num_samples     = 100
+num_samples     = 10
 # lr              = 1e-4
 device          = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 image_shape     = (4,480,640)
@@ -76,8 +76,8 @@ if __name__ == "__main__":
         # plt.savefig("results/test_img_"+str(i)+".png")
         plt.close()
 
-        if(i>10):
-            break
+        # if(i>10):
+        #     break
 
 
 
