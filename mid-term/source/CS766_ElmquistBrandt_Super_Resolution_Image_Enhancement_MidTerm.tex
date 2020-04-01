@@ -1,0 +1,81 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+
+\usepackage[backend=biber,style=ieee,sorting=none]{biblatex}
+
+\addbibresource{refs.bib}
+
+% command for red text 'todo' items
+\newcommand\todo[1]{\textcolor{red}{TODO: #1}}
+
+\title{CS766 -- Project Proposal \\ Super Resolution Image Enhancement}
+\author{Asher Elmquist (\texttt{amelmquist@wisc.edu}) \\
+Eric Brandt (\texttt{elbrandt@wisc.edu})
+}
+\date{Due: February 14, 2020}
+
+\begin{document}
+
+\maketitle
+
+%\begin{enumerate}
+%    \item Briefly explain what problem you are trying to solve.
+%    \item Why is this problem important? Why are you interested in it?
+%    \item What is the current state-of-the-art? 
+%    \item Are you planning on re-implementing an existing solution, or propose a new approach?** 
+%    \item If you are proposing your own approach, why do you think existing approaches cannot adequately solve this problem? Why do you think you solution will work better? 
+%    \item How will you evaluate the performance of your solution? What results and comparisons are you eventually planning to show? Include a time-line that you would like to follow. 
+%\end{enumerate}
+
+\section{Project Overview}
+The purpose of this project is to explore image super-resolution and understand how creating higher resolution or higher quality pictures can assist in downstream tasks such as object recognition or image segmentation. To understand the effect of super-resolution, we propose implementing a convolutional neural network for super-resolution based on the current state of the art. Beyond recreation of a current algorithm, we will study the general nature of the trained model, and explore the application of super-resolution in object detection accuracy and precision. This document covers the relevance of the project, a brief outline of the state of the art, a detailed description of the project plan, and a timeline that we plan to follow in order to accomplish the outlined tasks. 
+
+
+\section{Project Relevance}
+Generating super-resolution images from low resolution images has been used in medical imaging \cite{Pham2019, Georgescu2020}, astronomy imaging \cite{zhang2019} and security imaging \cite{yang2019deep}. Where small or blurry objects need to be identified, a higher resolution image increase the performance of existing object recognition algorithms. If super-resolution techniques deliver on their promises efficiently, we can transparently substitute lower resolution or more highly compressed images where previously costly high resolution images were required. Image storage, network transmission and video encoding/decoding  are several such examples. Super-resolution is an interesting task in and of itself, but we propose this project as a way to better understand and explore the potential for super-resolution networks to occupy one step in a pipeline for object detection or semantic segmentation tasks. The ability to locate objects potentially with sub-pixel precision in an image has interesting future applications for photogrammetry and metrology. To this end, our proposal centers on the implementation and application of super-resolution.
+
+
+\section{State of the Art}
+A recent and comprehensive overview of state of the art super-resolution algorithms and network structures can be found in \cite{yang2019deep}. A short discussion of key points as well as important notes will be given here as they relate to the project proposal. This discussion will cover generative adversarial networks (GANs) versus supervised learning for super resolution as well as a well-studied network structure that has been shown to work well in image enhancement architectures: ResNet \cite{he2016deep}.
+
+The problem of super-resolution (SR) is in the non-uniqueness of a high-resolution (HR) image generated from a lower-resolution (LR) image. For any LR there are multiple plausible HR that would be faithfully represented by the LR. One way to generate data for SR is to down sample an HR image. Unfortunately, generating training samples from down sampling can lead to small artifacts in the network when trained to directly undo the down sampling algorithm \cite{yang2019deep}. One way of circumventing this is to use an unsupervised learning approach so as not to unwittingly compute a mapping from input-output samples, but instead to compute a mapping from a distribution of inputs to a distribution of outputs. Generative adversarial networks accomplish exactly this and have been shown to work well for SR \cite{ledig2017photo}. While GANs would improve SR on real-world low-resolution images, we can explore SR in a more efficient manner when we have more control of the datasets and training as is the case with the supervised approach. State of the art results are shown from a supervised method in \cite{lim2017enhanced}.
+
+In super-resolution, the network architecture plays an important role in the accuracy and efficiency of the network. Many image processing network architectures (including SR) are built on a well-studied convolutional network called ResNet. This network uses a recursive structure to learn small changes in the image. The network is made up of residual blocks with a fraction of the input added directly to the output of a later  block. These connections are known as skip connections and are a fundamental component of the ResNet architecture \cite{he2016deep} to reduce the complexity of the loss surface and reduce convergence to local minima. These residual blocks, along with up-scaling via deconvolution form the basis of many SR network architectures \cite{yang2019deep} and are detailed in the implementation given in \cite{lim2017enhanced}.
+
+\section{Project Plan}
+The project will be split into four sections that will allow exploration beyond the state of the art. The first part of the project will be to recreate state of the art super-resolution results using machine learning. In itself this is a difficult task, but there is significant room to explore beyond what has been discussed in the previous section. To go further, we propose studying the generalization of the trained network by training and testing across different image domains. That is, we will train on a set of images, say buildings, and then evaluate the network on an animal image data set. In addition, we propose applying state-of-the-art, off-the-shelf object detection networks such as YOLO-V3 \cite{redmon2018yolov3} and SSD \cite{liu2016ssd} to understand if object recognition can be improved using super-resolution. Time-permitting, we will then extend to understand if other image improvement could help with object detection such as denoising or sharpening. Since similar networks for super-resolution can be modified for general image enhancement, this is a natural continuation of the project. Finally, we hope to pay attention to the time required to perform SR on images of particular sizes to evaluate the efficacy of real-time SR for live-acquisition applications on either general-purpose or dedicated hardware. Further details and data plans are laid out in the following sections.
+
+\subsection{Implement and Train Super-Resolution Network}
+Following the state of the art implementations, we will use a residual CNN as it has been shown to reduce error propagated across layers when given sufficient skip connections. To limit training time, we will avoid using generative adversarial networks. This will result in requiring the network to be trained through supervised learning, meaning we will require input and output image pairs. We do not foresee this being an issue as we can generate a dataset from a single set of high resolution images. This will also give us flexibility in the resolutions we choose to understand the extent to which resolution can be increased without unintended artifacts. For verification, our super-resolution can be compared against ground truth (original image) and bicubic or bilinear interpolation of the downsampled/corrupted image. We can also qualitatively compare our results to state-of-the-art results from the papers discussed previously.
+
+\subsection{Run Domain Transfer Study}
+We propose studying the general nature of our network by having three distinct datasets. These may be, for example, buildings, cars/roadways, and animals, each of which have a large corpora of readily available data. We will then hold out one dataset during training to use during testing to see if there are domain specific artifacts that appear on images with significant content differences. We will apply this holdout to each subset in turn to understand the full effects.
+
+
+\subsection{Apply Object Detection Networks}
+To understand if super-resolution improves object detection, YOLO-V3 and SSD will be used with pretrained weights. These networks have been shown to give state-of-the-art object detection accuracy. The accuracy of the pretrained networks will be run on the lower resolution images to generate a baseline accuracy for comparison. The networks will then be run on the higher resolution (cropped when necessary to create one-to-one comparison) to understand if super-resolution improves detection rate, position-precision, or class confidence. Multiple data sets will also allow us to understand if there is significant difference when detecting difference object classes.
+
+\subsection{Further Extend To General Image Enhancements}
+If time permits, we can extend this project to look at other image enhancements for improving object detection. Since the residual CNNs have the same architecture as general image processing networks, the network proposed can be adjusted and trained to denoise, or sharpen images at the lower resolution. We would then perform the same studies discussed above on the resulting denoised or sharpened images.
+
+\section{Timeline}
+In order to meet the class deadlines and adhere to the project plan, the following timeline is proposed.
+
+\begin{itemize}
+    \item \textbf{February 14th:} Project Proposal Due 
+    \item \textbf{March 13th:} Complete Super-Resolution Implementation
+    \item \textbf{March 20th:} Complete Domain Transfer Study
+    \item \textbf{March 25th:} Project Mid-Term Report due \textit{Possible re-alignment of goals based on progress thus far}
+    \item \textbf{April 3rd:} Complete Object Detection Study
+    \item \textbf{April 17th:} Complete Additional Image Enhancement Study
+    \item \textbf{April 27-May 1st:} Project Presentations
+    \item \textbf{May 4th:} Project Webpage Due
+\end{itemize}
+
+
+\printbibliography
+\end{document}
+
+
