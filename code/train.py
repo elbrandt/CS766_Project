@@ -9,7 +9,7 @@ from models import *
 from loaders import *
 
 num_epochs      = 10
-batch_size      = 8
+batch_size      = 4
 num_samples     = 100
 lr              = 1e-3
 device          = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -26,11 +26,10 @@ torch.set_default_dtype(torch.float32)
 if __name__ == "__main__":
     print("Starting training...")
 
-    # domain_A_dir = "/media/amelmquist/easystore/datasets/sidd/256_noise_train/"
-    # domain_B_dir = "/media/amelmquist/easystore/datasets/sidd/256_noise_train/"
-
-    # domain_A_dir = "/srv/home/amelmquist/datasets/hall/synthetic/train/"
-    # domain_B_dir = "/srv/home/amelmquist/datasets/hall/real/train/"
+    # dir_64 = "/home/asher/datasets/sr/Building/64/"
+    # dir_128 = "/home/asher/datasets/sr/Building/128/"
+    # dir_256 = "/home/asher/datasets/sr/Building/256/"
+    # dir_512 = "/home/asher/datasets/sr/Building/512/"
 
     dir_64 = "/home/amelmquist/datasets/sr/Buildings/64/"
     dir_128 = "/home/amelmquist/datasets/sr/Buildings/128/"

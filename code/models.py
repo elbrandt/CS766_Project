@@ -5,50 +5,52 @@ import torch.optim as optim
 import numpy as np
 import matplotlib.pyplot as plt
 import time
-from torchvision import models
+from torchvision import models, transforms
 
-# class VGG_OUTPUT(object):
-#
-#     def __init__(self, relu1_2, relu2_2, relu3_3, relu4_3):
-#         self.__dict__ = locals()
+class PerceptualLoss(torch.nn.Module):
+    def __init__(self):
+        super(PerceptualLoss, self).__init__()
+        pretrained_model = models.vgg19(pretrained=True)
+        self.layers1 = torch.nn.Sequential()
+        self.layers2 = torch.nn.Sequential()
+        self.layers3 = torch.nn.Sequential()
+        self.layers4 = torch.nn.Sequential()
 
+        for i in range(4):
+            self.layers1.add_module(str(i), pretrained_model.features[i])
 
-class VGG16(torch.nn.Module):
-    def __init__(self, requires_grad=False):
-        super(VGG16, self).__init__()
-        vgg_pretrained_features = models.vgg16(pretrained=True).features
-        self.slice1 = torch.nn.Sequential()
-        self.slice2 = torch.nn.Sequential()
-        self.slice3 = torch.nn.Sequential()
-        self.slice4 = torch.nn.Sequential()
-        for x in range(4):
-            self.slice1.add_module(str(x), vgg_pretrained_features[x])
-        for x in range(4, 9):
-            self.slice2.add_module(str(x), vgg_pretrained_features[x])
-        for x in range(9, 16):
-            self.slice3.add_module(str(x), vgg_pretrained_features[x])
-        for x in range(16, 23):
-            self.slice4.add_module(str(x), vgg_pretrained_features[x])
-        if not requires_grad:
-            for param in self.parameters():
-                param.requires_grad = False
+        for i in range(4,9):
+            self.layers2.add_module(str(i), pretrained_model.features[i])
 
-        self.slice1 = self.slice1.cuda()
-        self.slice2 = self.slice2.cuda()
-        self.slice3 = self.slice3.cuda()
-        self.slice4 = self.slice4.cuda()
+        for i in range(9,18):
+            self.layers3.add_module(str(i), pretrained_model.features[i])
 
-    def forward(self, X):
-        h = self.slice1(X)
-        h_relu1_2 = h
-        h = self.slice2(h)
-        h_relu2_2 = h
-        h = self.slice3(h)
-        h_relu3_3 = h
-        h = self.slice4(h)
-        h_relu4_3 = h
-        # return VGG_OUTPUT(h_relu1_2, h_relu2_2, h_relu3_3, h_relu4_3)
-        return h_relu4_3
+        for i in range(18,27):
+            self.layers4.add_module(str(i), pretrained_model.features[i])
+
+        for p in self.parameters():
+            p.requires_grad = False
+
+        self.layers1 = self.layers1.cuda()
+        self.layers2 = self.layers2.cuda()
+        self.layers3 = self.layers3.cuda()
+        self.layers4 = self.layers4.cuda()
+
+        # self.normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
+        #                              std=[0.229, 0.224, 0.225])
+
+        # self.transform = transforms.Compose([normalize])
+
+    def forward(self, x):
+        # for i in range(x.size()[0]):
+        #     x[i,:,:,:] = self.normalize((x[i,:,:,:]*.5+.5))
+        l1 = self.layers1(x)
+        l2 = self.layers2(l1)
+        l3 = self.layers3(l2)
+        l4 = self.layers4(l3)
+
+        return [l1,l2,l3,l4]
+
 
 ################3
 # Cycle GAN created for image to image translation of 4,480,640
@@ -62,6 +64,9 @@ class SRNet():
 
         self.up = 1
         self.max_up = 3 #how far will we want to go? 2**n = 2048 ==> n=5
+
+        self.pixel_loss_weight = 10
+        self.perceptual_loss_weight = [.2,.2,.1,.1]
 
         # self.gen_A2B = GeneratorUNet(f=gen_layer_factor)
         # self.gen_B2A = GeneratorUNet(f=gen_layer_factor)
@@ -99,7 +104,8 @@ class SRNet():
         # self.loss_function = nn.MSELoss()
         # self.loss_function = nn.L1Loss()
         self.loss_function = nn.MSELoss()
-        self.loss_net = VGG16()
+        self.loss_net = PerceptualLoss()
+        self.loss_net.eval()
 
         #training loop
         t0 = time.time()
@@ -113,10 +119,11 @@ class SRNet():
                 #grab some real samples
                 img_low,img_high = data
 
-                img_inputs = [img_low.to(self.device)]
-                for u in range(1,self.up+1):
-                    u_f = 2**u
-                    img_inputs.append(torch.from_numpy(np.random.uniform(-1,1,(img_low.shape[0],1,img_low.shape[3]*u_f,img_low.shape[3]*u_f)).astype(np.float32)).to(self.device))
+                # img_inputs = [img_low.to(self.device)]
+                img_inputs = img_low.to(self.device)
+                # for u in range(1,self.up+1):
+                #     u_f = 2**u
+                #     img_inputs.append(torch.from_numpy(np.random.uniform(-1,1,(img_low.shape[0],1,img_low.shape[3]*u_f,img_low.shape[3]*u_f)).astype(np.float32)).to(self.device))
 
                     # print("Len:",len(img_inputs))
                 # print(img_inputs)
@@ -129,8 +136,13 @@ class SRNet():
                 #make prediction
                 pred_high = self.net(img_inputs)
                 #propagate loss
-                loss = self.loss_function(pred_high,img_high)
-                loss += torch.mean(torch.abs(self.loss_net(pred_high) -  self.loss_net(img_high)))
+                loss = self.pixel_loss_weight*self.loss_function(pred_high,img_high)
+                pred_features = self.loss_net(pred_high)
+                target_features = self.loss_net(img_high)
+                loss += self.perceptual_loss_weight[0]*torch.mean((pred_features[0] -  target_features[0])**2)
+                loss += self.perceptual_loss_weight[1]*torch.mean((pred_features[1] -  target_features[1])**2)
+                loss += self.perceptual_loss_weight[2]*torch.mean((pred_features[2] -  target_features[2])**2)
+                loss += self.perceptual_loss_weight[3]*torch.mean((pred_features[3] -  target_features[3])**2)
                 loss.backward()
                 loss_sum += loss.item()
                 #step the optimizer
@@ -154,10 +166,11 @@ class SRNet():
                     img_low,img_high = next(iter(data_loader))
                     #grab some real samples
                     img_low,img_high = data
-                    img_inputs = [img_low.to(self.device)]
-                    for u in range(1,self.up+1):
-                        u_f = 2**u
-                        img_inputs.append(torch.from_numpy(np.random.uniform(-1,1,(img_low.shape[0],1,img_low.shape[3]*u_f,img_low.shape[3]*u_f)).astype(np.float32)).to(self.device))
+                    # img_inputs = [img_low.to(self.device)]
+                    img_inputs = img_low.to(self.device)
+                    # for u in range(1,self.up+1):
+                    #     u_f = 2**u
+                    #     img_inputs.append(torch.from_numpy(np.random.uniform(-1,1,(img_low.shape[0],1,img_low.shape[3]*u_f,img_low.shape[3]*u_f)).astype(np.float32)).to(self.device))
 
                     # img_noise = torch.from_numpy(np.random.uniform(-1,1,img_low.shape).astype(np.float32))
                     # img_low_cat = torch.cat([img_low,img_noise],1)
@@ -219,13 +232,13 @@ class SRResNet(nn.Module):
         self.in1_1 = nn.InstanceNorm2d(4*f)
         self.conv1_2 = nn.Conv2d(in_channels=4*f,out_channels=8*f,kernel_size=3,stride=1,padding=1)
         self.in1_2 = nn.InstanceNorm2d(8*f)
-        self.conv1_3 = nn.Conv2d(in_channels=8*f,out_channels=8*f+1,kernel_size=3,stride=1,padding=1)
-        self.in1_3 = nn.InstanceNorm2d(8*f+1)
+        self.conv1_3 = nn.Conv2d(in_channels=8*f,out_channels=8*f,kernel_size=3,stride=1,padding=1)
+        self.in1_3 = nn.InstanceNorm2d(8*f)
 
         #upsampling
         self.blocks = nn.ModuleList()
         for i in range(max_up):
-            self.conv2_1 = nn.Conv2d(in_channels=8*f+1,out_channels=16*f,kernel_size=5,stride=1,padding=2)
+            self.conv2_1 = nn.Conv2d(in_channels=8*f,out_channels=16*f,kernel_size=5,stride=1,padding=2)
             self.in2_1 = nn.InstanceNorm2d(16*f)
             self.conv2_2 = nn.Conv2d(in_channels=16*f,out_channels=16*f,kernel_size=3,stride=1,padding=1)
             self.in2_2 = nn.InstanceNorm2d(16*f)
@@ -240,7 +253,7 @@ class SRResNet(nn.Module):
 
 
         #finishing block for CNN
-        self.conv_out_1 = nn.Conv2d(in_channels=8*f+1,out_channels=8*f,kernel_size=5,stride=1,padding=2)
+        self.conv_out_1 = nn.Conv2d(in_channels=8*f,out_channels=8*f,kernel_size=5,stride=1,padding=2)
         self.in_out_1 = nn.InstanceNorm2d(8*f)
         self.conv_out_2 = nn.Conv2d(in_channels=8*f,out_channels=8*f,kernel_size=3,stride=1,padding=1)
         self.in_out_2 = nn.InstanceNorm2d(8*f)
@@ -252,8 +265,8 @@ class SRResNet(nn.Module):
         self.init_weights()
 
     def forward(self,x):
-        inputs = x
-        x = inputs[0]
+        # inputs = x
+        # x = inputs[0]
         x = self.relu(self.conv1_1(x))
         x = self.relu(self.in1_2(self.conv1_2(x)))
         x = self.relu(self.in1_3(self.conv1_3(x)))
@@ -274,18 +287,8 @@ class SRResNet(nn.Module):
             x = self.blocks[i][10](x)
 
             #noise introcuction for details at next higher resolution
-            x = torch.cat([x,inputs[i+1]],1)
-            #for j in range(0,6):
-            #    x = (self.blocks[i][j])(x)
+            # x = torch.cat([x,inputs[i+1]],1)
 
-            #x = torch.add(x,x_save)
-            #for j in range(6,9):
-            #    x = (self.blocks[i][j])(x)
-
-            # x = self.relu(self.in2_1(self.conv2_1(x)))
-            # x = self.relu(self.in2_2(self.conv2_2(x)))
-            # x = self.relu(self.in2_3(self.conv2_3(x)))
-            # x = self.shuffle(x)
 
         x = self.relu(self.in_out_1(self.conv_out_1(x)))
         x = self.relu(self.in_out_2(self.conv_out_2(x)))
