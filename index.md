@@ -30,7 +30,7 @@ A .pdf of the Mid-Project Report  with in-progress results can be foubnd [here](
 - [ ] **April 15th:** Begin evaluating performance. Begin working with image segmentation models.
 - [ ] **April 22nd:** Compile final tests and results data. Begin work on video presentation.
 - [ ] **April 29th:** Assemble project report, web page, and video presentation.
-- [ ] **May 4th:** Project web page \& video presentation due.
+- [ ] **May 4th:** Project web page & video presentation due.
 
 ## Original Proposal
 
