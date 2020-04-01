@@ -12,7 +12,7 @@ The purpose of this project is to explore image super-resolution and understand 
 
 
 ## Mid-Project Report
-A .pdf of the Mid-Project Report  with in-progress results [here](https://github.com/elbrandt/CS766_Project/blob/master/mid-term/CS766_ElmquistBrandt_Super_Resolution_Image_Enhancement_MidTerm.pdf).
+A .pdf of the Mid-Project Report  with in-progress results can be foubnd [here](https://github.com/elbrandt/CS766_Project/blob/master/mid-term/CS766_ElmquistBrandt_Super_Resolution_Image_Enhancement_MidTerm.pdf).
 
 ## Mid-Term Example Results
 ![Food1](https://raw.githubusercontent.com/elbrandt/CS766_Project/master/mid-term/source/midterm_results/test_img_0.png)
