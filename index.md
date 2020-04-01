@@ -6,13 +6,19 @@ Asher Elmquist (```amelmquist@wisc.edu```)
  
 Eric Brandt (```elbrandt@wisc.edu```)
 
-## Proposal
-
-A .pdf of the formal Project Proposal with complete details can be found [here](https://github.com/elbrandt/CS766_Project/blob/master/proposal/CS766_ElmquistBrandt_Super_Resolution_Image_Enhancement.pdf).
-
 ### Overview
 
 The purpose of this project is to explore image super-resolution and understand how creating higher resolution or higher quality pictures can assist in downstream tasks such as object recognition or image segmentation. To understand the effect of super-resolution, we propose implementing a convolutional neural network for super-resolution based on the current state of the art. Beyond recreation of a current algorithm, we will study the general nature of the trained model, and explore the application of super-resolution in object detection accuracy and precision.
+
+
+## Mid-Project Report
+A .pdf of the Mid-Project Report  with in-progress results [here](https://github.com/elbrandt/CS766_Project/blob/master/mid-term/CS766_ElmquistBrandt_Super_Resolution_Image_Enhancement_MidTerm.pdf).
+
+## Mid-Term Example Results
+![Food1](https://raw.githubusercontent.com/elbrandt/CS766_Project/master/mid-term/source/midterm_results/test_img_0.png)
+![Food2](https://raw.githubusercontent.com/elbrandt/CS766_Project/master/mid-term/source/midterm_results/test_img_1.png)
+![Building1](https://raw.githubusercontent.com/elbrandt/CS766_Project/master/mid-term/source/midterm_results/test_img_6.png)
+![Building2](https://raw.githubusercontent.com/elbrandt/CS766_Project/master/mid-term/source/midterm_results/test_img_11.png)
 
 ### Working Timeline
 
@@ -26,14 +32,10 @@ The purpose of this project is to explore image super-resolution and understand 
 - [ ] **April 29th:** Assemble project report, web page, and video presentation.
 - [ ] **May 4th:** Project web page \& video presentation due.
 
-## Mid-Project Report
-A .pdf of the Mid-Project Report  with in-progress results [here](https://github.com/elbrandt/CS766_Project/blob/master/mid-term/CS766_ElmquistBrandt_Super_Resolution_Image_Enhancement_MidTerm.pdf).
+## Original Proposal
 
-## Mid-Term Example Results
-![Food1](https://raw.githubusercontent.com/elbrandt/CS766_Project/master/mid-term/source/midterm_results/test_img_0.png)
-![Food2](https://raw.githubusercontent.com/elbrandt/CS766_Project/master/mid-term/source/midterm_results/test_img_1.png)
-![Building1](https://raw.githubusercontent.com/elbrandt/CS766_Project/master/mid-term/source/midterm_results/test_img_6.png)
-![Building2](https://raw.githubusercontent.com/elbrandt/CS766_Project/master/mid-term/source/midterm_results/test_img_11.png)
+A .pdf of the formal Project Proposal with complete details can be found [here](https://github.com/elbrandt/CS766_Project/blob/master/proposal/CS766_ElmquistBrandt_Super_Resolution_Image_Enhancement.pdf).
+
 ## Final Report & Video Presentation
 
 Todo: Due May 4, 2020
