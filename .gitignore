@@ -2,7 +2,9 @@ code/saved_models/
 code/progress*
 code/results*
 
-dataset/Retriever/downloads/
-dataset/Retriever/resized/
+dataset/downloads*
+dataset/comparison*
+dataset/upsampled*
+dataset/resized*
 
 *.pyc

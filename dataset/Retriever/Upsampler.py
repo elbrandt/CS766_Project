@@ -8,11 +8,13 @@ import cv2
 import glob
 
 # Global settings
-f_sourceLocation = "/home/amelmquist/datasets/sr"
-f_resizeLocation = "/home/amelmquist/datasets/sr/upsampled"
+#f_sourceLocation = "/home/amelmquist/datasets/sr"
+#f_resizeLocation = "/home/amelmquist/datasets/sr/upsampled"
+f_sourceLocation = "resized"
+f_resizeLocation = "upsampled"
 g_startSize = 64
 g_endSize = 512
-g_oneShotUpsize = True; # true=? start->end in one rescale, false=>rescale x2 repeatedly
+g_oneShotUpsize = True # true=? start->end in one rescale, false=>rescale x2 repeatedly
 
 
 def ensure_dir_exists(fname):
