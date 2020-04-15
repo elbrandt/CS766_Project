@@ -36,14 +36,16 @@ class PerceptualLoss(torch.nn.Module):
         self.layers3 = self.layers3.cuda()
         self.layers4 = self.layers4.cuda()
 
-        # self.normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
-        #                              std=[0.229, 0.224, 0.225])
+        self.rmean = torch.tensor([0.5, 0.5, 0.5]).view(1,3,1,1).cuda()
+        self.rstd = torch.tensor([0.5, 0.5, 0.5]).view(1,3,1,1).cuda()
 
-        # self.transform = transforms.Compose([normalize])
+        self.mean = torch.tensor([0.485, 0.456, 0.406]).view(1,3,1,1).cuda()
+        self.std = torch.tensor([0.229, 0.224, 0.225]).view(1,3,1,1).cuda()
+
 
     def forward(self, x):
-        # for i in range(x.size()[0]):
-        #     x[i,:,:,:] = self.normalize((x[i,:,:,:]*.5+.5))
+        x = ((x*self.rstd + self.rmean) - self.mean) / self.std
+
         l1 = self.layers1(x)
         l2 = self.layers2(l1)
         l3 = self.layers3(l2)
@@ -65,12 +67,12 @@ class SRNet():
         self.up = 1
         self.max_up = 3 #how far will we want to go? 2**n = 2048 ==> n=5
 
-        self.pixel_loss_weight = 10
-        self.perceptual_loss_weight = [.2,.2,.1,.1]
+        self.pixel_loss_weight = 20
+        self.perceptual_loss_weight = [1,0,0,0] #[1,.1,.01,.1]
 
         # self.gen_A2B = GeneratorUNet(f=gen_layer_factor)
         # self.gen_B2A = GeneratorUNet(f=gen_layer_factor)
-        self.net = SRResNet(f=4,up=self.up,max_up=self.max_up)
+        self.net = SRResNet(f=2,up=self.up,max_up=self.max_up)
 
         #load weights from file if we are to continue from previous training
         if self.continue_from_save:
@@ -112,7 +114,7 @@ class SRNet():
         for e in range(self.num_epochs):
 
             #zero out our loss trackers
-            loss_sum = 0
+            loss_sum = np.zeros((5))
             num_steps = 0 #counter for discriminator updates
             for i,data in enumerate(self.data_loader, 0):
                 num_steps += 1
@@ -136,29 +138,28 @@ class SRNet():
                 #make prediction
                 pred_high = self.net(img_inputs)
                 #propagate loss
-                loss = self.pixel_loss_weight*self.loss_function(pred_high,img_high)
+                loss_pix = self.pixel_loss_weight*self.loss_function(pred_high,img_high)
                 pred_features = self.loss_net(pred_high)
                 target_features = self.loss_net(img_high)
-                loss += self.perceptual_loss_weight[0]*torch.mean((pred_features[0] -  target_features[0])**2)
-                loss += self.perceptual_loss_weight[1]*torch.mean((pred_features[1] -  target_features[1])**2)
-                loss += self.perceptual_loss_weight[2]*torch.mean((pred_features[2] -  target_features[2])**2)
-                loss += self.perceptual_loss_weight[3]*torch.mean((pred_features[3] -  target_features[3])**2)
+                loss_f1 = self.perceptual_loss_weight[0]*torch.mean((pred_features[0] -  target_features[0])**2)
+                loss_f2 = self.perceptual_loss_weight[1]*torch.mean((pred_features[1] -  target_features[1])**2)
+                loss_f3 = self.perceptual_loss_weight[2]*torch.mean((pred_features[2] -  target_features[2])**2)
+                loss_f4 = self.perceptual_loss_weight[3]*torch.mean((pred_features[3] -  target_features[3])**2)
+                loss = loss_pix+loss_f1+loss_f2+loss_f3+loss_f4
                 loss.backward()
-                loss_sum += loss.item()
+                loss_sum += np.array([loss_pix.item(),loss_f1.item(),loss_f2.item(),loss_f3.item(),loss_f4.item()])
                 #step the optimizer
                 self.opt.step()
 
                 #print when needed
                 if(i%self.print_interval == self.print_interval-1):
-                    print('[%d/%d],[%d/%d], Loss: %.6f'%#', C_ABA: %.6f, C_BAB: %.6f' %
+                    print('[%d/%d],[%d/%d]'%#', C_ABA: %.6f, C_BAB: %.6f' %
                         (e + 1, self.num_epochs,
-                        i + 1, self.num_samples/self.batch_size,
-                        loss_sum / (print_interval)#,
-                        # loss_C_ABA_sum / (print_interval*num_g_steps),
-                        # loss_C_BAB_sum / (print_interval*num_g_steps)
-                        ))
+                        i + 1, self.num_samples/self.batch_size),  "Losses:",
+                        loss_sum / print_interval#,
+                        )
 
-                    loss_sum = 0
+                    loss_sum = np.zeros((5))
                     num_steps = 0
 
                 #save images if needed
@@ -202,13 +203,16 @@ class SRNet():
         return sr_img
 
     def load(self):
-        self.net.load("saved_models/net")
+        self.net = torch.load("test_model")
+        # self.net.load("saved_models/net")
 
     def save(self):
-        if torch.cuda.device_count() > 1:
-            self.net.module.save("saved_models/net")
-        else:
-            self.net.save("saved_models/net")
+        torch.save(self.net, "test_model")
+
+        # if torch.cuda.device_count() > 1:
+        #     self.net.module.save("saved_models/net")
+        # else:
+        #     self.net.save("saved_models/net")
 
     def export(self):
         pass

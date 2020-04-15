@@ -8,15 +8,15 @@ import time
 from models import *
 from loaders import *
 
-num_epochs      = 10
-batch_size      = 4
-num_samples     = 100
+num_epochs      = 100
+batch_size      = 8
+num_samples     = 1000
 lr              = 1e-3
 device          = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 image_shape     = (4,480,640)
-print_interval  = 1    #in terms of batches
+print_interval  = 10    #in terms of batches
 save_interval   = 1    #in terms of epochs
-img_progress_interval = 1    #in terms of batches
+img_progress_interval = 100    #in terms of batches
 
 continue_from_save = False
 
