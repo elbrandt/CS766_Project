@@ -10,31 +10,18 @@ from torchvision import models, transforms
 class PerceptualLoss(torch.nn.Module):
     def __init__(self):
         super(PerceptualLoss, self).__init__()
-        pretrained_model = models.vgg19(pretrained=True)
-        self.layers1 = torch.nn.Sequential()
-        self.layers2 = torch.nn.Sequential()
-        self.layers3 = torch.nn.Sequential()
-        self.layers4 = torch.nn.Sequential()
+        self.net = models.vgg19(pretrained=True).features
+        self.net._modules['4'] = nn.AvgPool2d(kernel_size=2,stride=2,padding=1)
+        self.net._modules['9'] = nn.AvgPool2d(kernel_size=2,stride=2,padding=1)
+        self.net._modules['18'] = nn.AvgPool2d(kernel_size=2,stride=2,padding=1)
+        self.net._modules['27'] = nn.AvgPool2d(kernel_size=2,stride=2,padding=1)
+        self.net._modules['36'] = nn.AvgPool2d(kernel_size=2,stride=2,padding=1)
 
-        for i in range(4):
-            self.layers1.add_module(str(i), pretrained_model.features[i])
-
-        for i in range(4,9):
-            self.layers2.add_module(str(i), pretrained_model.features[i])
-
-        for i in range(9,18):
-            self.layers3.add_module(str(i), pretrained_model.features[i])
-
-        for i in range(18,27):
-            self.layers4.add_module(str(i), pretrained_model.features[i])
-
-        for p in self.parameters():
+        for p in self.net.parameters():
             p.requires_grad = False
 
-        self.layers1 = self.layers1.cuda()
-        self.layers2 = self.layers2.cuda()
-        self.layers3 = self.layers3.cuda()
-        self.layers4 = self.layers4.cuda()
+        self.net.eval()
+        self.net.cuda()
 
         self.rmean = torch.tensor([0.5, 0.5, 0.5]).view(1,3,1,1).cuda()
         self.rstd = torch.tensor([0.5, 0.5, 0.5]).view(1,3,1,1).cuda()
@@ -42,20 +29,22 @@ class PerceptualLoss(torch.nn.Module):
         self.mean = torch.tensor([0.485, 0.456, 0.406]).view(1,3,1,1).cuda()
         self.std = torch.tensor([0.229, 0.224, 0.225]).view(1,3,1,1).cuda()
 
+        self.feature_layers = [4,9,18,27]
 
     def forward(self, x):
         x = ((x*self.rstd + self.rmean) - self.mean) / self.std
 
-        l1 = self.layers1(x)
-        l2 = self.layers2(l1)
-        l3 = self.layers3(l2)
-        l4 = self.layers4(l3)
+        outputs = []
+        for n, l in enumerate(self.net):
+            x = l(x)
+            if n in self.feature_layers:
+                outputs.append(x)
+                if len(outputs) >= len(self.feature_layers):
+                    break
+        return outputs
 
-        return [l1,l2,l3,l4]
 
-
-################3
-# Cycle GAN created for image to image translation of 4,480,640
+########################
 class SRNet():
     def __init__(self,image_shape,device=torch.device("cpu"),continue_from_save=False):
         self.device = device
@@ -67,8 +56,8 @@ class SRNet():
         self.up = 1
         self.max_up = 3 #how far will we want to go? 2**n = 2048 ==> n=5
 
-        self.pixel_loss_weight = 20
-        self.perceptual_loss_weight = [1,0,0,0] #[1,.1,.01,.1]
+        self.pixel_loss_weight = 10
+        self.perceptual_loss_weight = [1,.7,.5,0] #[1,.1,.01,.1]
 
         # self.gen_A2B = GeneratorUNet(f=gen_layer_factor)
         # self.gen_B2A = GeneratorUNet(f=gen_layer_factor)
