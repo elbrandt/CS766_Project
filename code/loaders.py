@@ -67,8 +67,14 @@ class Img2ImgJITTestLoader(torch.utils.data.Dataset):
 
         #only know which images can be loaded, don't actually load them yet
         self.img_list_x = glob.glob(x_dir+"*"+file_type)
-        self.img_list_y = glob.glob(y_dir+"*"+file_type)
-        self.img_list_up = glob.glob(up_dir+"*"+file_type)
+        self.img_list_y = [] # glob.glob(y_dir+"*"+file_type)
+        self.img_list_up = [] #glob.glob(up_dir+"*"+file_type)
+
+        for f in self.img_list_x:
+            file_name = f.split("/")[len(f.split("/"))-1]
+            self.img_list_y.append(y_dir+file_name)
+            self.img_list_up.append(up_dir+file_name)
+
 
         self.data_len = min(len(self.img_list_x),len(self.img_list_y),len(self.img_list_up))
 

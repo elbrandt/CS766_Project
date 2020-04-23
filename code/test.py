@@ -39,8 +39,6 @@ if __name__ == "__main__":
 
     #intialize the GAN
     model = SRNet(image_shape=image_shape,device=device,continue_from_save=False)
-    # model.grow()
-    # model.grow()
     model.load()
 
     for i,data in enumerate(data_loader, 0):
