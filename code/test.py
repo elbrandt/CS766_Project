@@ -47,15 +47,10 @@ if __name__ == "__main__":
     data_loader = torch.utils.data.DataLoader(data_JIT_loader, batch_size=batch_size,shuffle=True,num_workers=4)
 
     #intialize the GAN
-<<<<<<< HEAD
 
     # model = SRNet(image_shape=image_shape,model_name="Building",device=device,continue_from_save=False)
     model = torch.load("Building")
     model.eval()
-=======
-    model = SRNet(image_shape=image_shape,model_name="Building",device=device,continue_from_save=False)
-    model.load("Building")
->>>>>>> inference_02
 
     for i,data in enumerate(data_loader, 0):
         low_res,high_res,upsampled = data
