@@ -56,12 +56,14 @@ class PerceptualLoss(torch.nn.Module):
 
 ########################
 class SRNet():
-    def __init__(self,image_shape,device=torch.device("cpu"),continue_from_save=False):
+    def __init__(self,image_shape,model_name="model",device=torch.device("cpu"),continue_from_save=False):
         self.device = device
         self.continue_from_save = continue_from_save
         self.c=image_shape[0]
         self.h=image_shape[1]
         self.w=image_shape[2]
+    
+        self.name = model_name
 
         self.up = 1
         self.max_up = 3 #how far will we want to go? 2**n = 2048 ==> n=5
@@ -69,17 +71,11 @@ class SRNet():
         self.pixel_loss_weight = 10
         self.perceptual_loss_weight = [1,.7,.5,0] #[1,.1,.01,.1]
 
-        # self.gen_A2B = GeneratorUNet(f=gen_layer_factor)
-        # self.gen_B2A = GeneratorUNet(f=gen_layer_factor)
         self.net = SRResNet(f=64,up=self.up,max_up=self.max_up)
 
         #load weights from file if we are to continue from previous training
         if self.continue_from_save:
-            self.load()
-
-        if torch.cuda.device_count() > 1:
-            print("Using:",torch.cuda.device_count(),"devices")
-            self.net = nn.DataParallel(self.gen_A2B)
+            self.load("saved_models/"+self.name)
 
         #put the networks on the gpu
         self.net.to(device)
@@ -208,24 +204,24 @@ class SRNet():
                     ax[2].imshow(img_high.detach().cpu().numpy().transpose((0, 2, 3, 1))[0,:,:,:]*.5+.5)
                     ax[2].set_title('Real High Res')
 
-                    plt.savefig("progress/progress_"+str(self.up)+"_"+str(e)+"_"+str(i)+".png")
+                    plt.savefig("progress/"+self.name+"_"+str(self.up)+"_"+str(e)+"_"+str(i)+".png")
                     plt.close(f)
 
             #save when needed
             if (e % self.save_interval == self.save_interval-1):
-                self.save()
+                self.save("saved_models/"+self.name)
                 self.export()
 
     def test(self,inputs):
         sr_img = self.net(inputs)
         return sr_img
 
-    def load(self):
-        self.net = torch.load("test_model")
+    def load(self,path):
+        self.net = torch.load(path)
         # self.net.load("saved_models/net")
 
-    def save(self):
-        torch.save(self.net, "test_model")
+    def save(self,path):
+        torch.save(self.net, path)
 
         # if torch.cuda.device_count() > 1:
         #     self.net.module.save("saved_models/net")
