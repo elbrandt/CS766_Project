@@ -8,3 +8,5 @@ dataset/upsampled*
 dataset/resized*
 
 *.pyc
+dataset/*
+testdata/*
