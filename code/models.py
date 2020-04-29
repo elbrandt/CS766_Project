@@ -19,12 +19,12 @@ def gram_matrix(y):
 class PerceptualLoss(torch.nn.Module):
     def __init__(self):
         super(PerceptualLoss, self).__init__()
-        pretrained_model = models.vgg19(pretrained=True)
+        pretrained_model = models.vgg19(pretrained=True).features
         self.layers = torch.nn.Sequential()
 
         i = 0
-        for i in range(8):#10,19
-            self.layers.add_module(str(i), pretrained_model.features[i])
+        for i in range(4):#10,19 4=relu_1_2, 8=relu_2_2
+            self.layers.add_module(str(i), pretrained_model[i])
 
         for p in self.parameters():
             p.requires_grad = False
@@ -61,7 +61,7 @@ class SRNet():
         self.up = 3
         self.max_up = 3 #how far will we want to go? 2**n = 2048 ==> n=5
 
-        self.pixel_loss_weight = 100
+        self.pixel_loss_weight = 10
         self.perceptual_loss_weight = [1,.7,.5,0] #[1,.1,.01,.1]
 
         self.net = SRResNet(f=64,up=self.up,max_up=self.max_up)
@@ -87,6 +87,8 @@ class SRNet():
         self.print_interval = print_interval
         self.save_interval = save_interval
         self.num_epochs = num_epochs
+
+        self.net.train()
 
         #initialize optimizers
         self.opt = optim.Adam(self.net.parameters(), lr=lr)
@@ -145,7 +147,7 @@ class SRNet():
                 # loss = loss_pix+loss_f1+loss_f2+loss_f3+loss_f4
                 # loss = loss_pix+loss_tex
                 loss = 0
-                if(e<10):
+                if(e<0):
                     loss = loss_pix
                 else:
                     loss = loss_pix + loss_tex
@@ -251,9 +253,9 @@ class SRResNet(nn.Module):
         self.blocks = nn.ModuleList()
         for i in range(self.num_blocks):
             self.conv2_1 = nn.Conv2d(in_channels=f,out_channels=f,kernel_size=3,stride=1,padding=1,padding_mode="reflection")
-            self.in2_1 = nn.InstanceNorm2d(8*f)
+            self.in2_1 = nn.InstanceNorm2d(f)
             self.conv2_2 = nn.Conv2d(in_channels=f,out_channels=f,kernel_size=3,stride=1,padding=1,padding_mode="reflection")
-            self.in2_2 = nn.InstanceNorm2d(8*f)
+            self.in2_2 = nn.InstanceNorm2d(f)
             # self.conv2_3 = nn.Conv2d(in_channels=16*f,out_channels=16*f,kernel_size=3,stride=1,padding=1)
             # self.in2_3 = nn.InstanceNorm2d(16*f)
             # self.conv2_4 = nn.Conv2d(in_channels=16*f,out_channels=16*f,kernel_size=3,stride=1,padding=1)
@@ -275,8 +277,8 @@ class SRResNet(nn.Module):
         # self.in_out_1 = nn.InstanceNorm2d(8*f)
         # self.conv_out_2 = nn.Conv2d(in_channels=8*f,out_channels=8*f,kernel_size=3,stride=1,padding=1)
         # self.in_out_2 = nn.InstanceNorm2d(8*f)
-        # self.conv_out_3 = nn.Conv2d(in_channels=8*f,out_channels=8*f,kernel_size=3,stride=1,padding=1)
-        # self.in_out_3 = nn.InstanceNorm2d(8*f)
+        # self.conv_out_3 = nn.Conv2d(in_channels=f,out_channels=f,kernel_size=3,stride=1,padding=1,padding_mode="reflection")
+        # self.in_out_3 = nn.InstanceNorm2d(f)
         self.conv_out_4 = nn.Conv2d(in_channels=f,out_channels=3,kernel_size=3,stride=1,padding=1,padding_mode="reflection")
 
         #initialize weights
@@ -314,6 +316,7 @@ class SRResNet(nn.Module):
 
         # x = self.relu(self.in_out_1(self.conv_out_1(x)))
         # x = self.relu(self.in_out_2(self.conv_out_2(x)))
+        # x = self.relu(self.in_out_3(self.conv_out_3(x)))
         # x = self.relu(self.in_out_3(self.conv_out_3(x)))
         x = self.tanh(self.conv_out_4(x))
 
