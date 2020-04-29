@@ -38,8 +38,8 @@ if __name__ == "__main__":
     data_loader = torch.utils.data.DataLoader(data_JIT_loader, batch_size=batch_size,shuffle=True,num_workers=4)
 
     #intialize the GAN
-    model = SRNet(image_shape=image_shape,device=device,continue_from_save=False)
-    model.load()
+    model = SRNet(image_shape=image_shape,model_name="Building",device=device,continue_from_save=False)
+    model.load("Building")
 
     for i,data in enumerate(data_loader, 0):
         low_res,high_res,upsampled = data
