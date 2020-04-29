@@ -19,18 +19,15 @@ def gram_matrix(y):
 class PerceptualLoss(torch.nn.Module):
     def __init__(self):
         super(PerceptualLoss, self).__init__()
-        self.net = models.vgg19(pretrained=True).features
-        # self.net._modules['4'] = nn.AvgPool2d(kernel_size=2,stride=2,padding=1)
-        # self.net._modules['9'] = nn.AvgPool2d(kernel_size=2,stride=2,padding=1)
-        # self.net._modules['18'] = nn.AvgPool2d(kernel_size=2,stride=2,padding=1)
-        # self.net._modules['27'] = nn.AvgPool2d(kernel_size=2,stride=2,padding=1)
-        # self.net._modules['36'] = nn.AvgPool2d(kernel_size=2,stride=2,padding=1)
+        pretrained_model = models.vgg19(pretrained=True)
+        self.layers = torch.nn.Sequential()
 
-        for p in self.net.parameters():
+        i = 0
+        for i in range(8):#10,19
+            self.layers.add_module(str(i), pretrained_model.features[i])
+
+        for p in self.parameters():
             p.requires_grad = False
-
-        self.net.eval()
-        self.net.cuda()
 
         self.rmean = torch.tensor([0.5, 0.5, 0.5]).view(1,3,1,1).cuda()
         self.rstd = torch.tensor([0.5, 0.5, 0.5]).view(1,3,1,1).cuda()
@@ -38,21 +35,17 @@ class PerceptualLoss(torch.nn.Module):
         self.mean = torch.tensor([0.485, 0.456, 0.406]).view(1,3,1,1).cuda()
         self.std = torch.tensor([0.229, 0.224, 0.225]).view(1,3,1,1).cuda()
 
-        # self.feature_layers = [8,17,26,35]
-        self.feature_layers = [8,17,26,35]
+        self.layers = self.layers.cuda()
+        self.layers.eval()
 
-    def forward(self, x):
+    def forward(self, x, y):
         x = ((x*self.rstd + self.rmean) - self.mean) / self.std
+        y = ((y*self.rstd + self.rmean) - self.mean) / self.std
 
-        outputs = []
-        for n, l in enumerate(self.net):
-            x = l(x)
-            if n in self.feature_layers:
-                outputs.append(x)
-                if len(outputs) >= len(self.feature_layers):
-                    break
-        return outputs
+        x = self.layers(x)
+        y = self.layers(y)
 
+        return torch.mean((x - y)**2)
 
 ########################
 class SRNet():
@@ -62,13 +55,13 @@ class SRNet():
         self.c=image_shape[0]
         self.h=image_shape[1]
         self.w=image_shape[2]
-    
+
         self.name = model_name
 
-        self.up = 1
+        self.up = 3
         self.max_up = 3 #how far will we want to go? 2**n = 2048 ==> n=5
 
-        self.pixel_loss_weight = 10
+        self.pixel_loss_weight = 100
         self.perceptual_loss_weight = [1,.7,.5,0] #[1,.1,.01,.1]
 
         self.net = SRResNet(f=64,up=self.up,max_up=self.max_up)
@@ -135,18 +128,18 @@ class SRNet():
                 #propagate loss
 
                 loss_pix = self.pixel_loss_weight*self.loss_function(pred_high,img_high)
-                pred_features = self.loss_net(pred_high)
-                target_features = self.loss_net(img_high)
+                # pred_features = self.loss_net(pred_high)
+                # target_features = self.loss_net(img_high)
                 # loss_f1 = self.perceptual_loss_weight[0]*torch.mean((pred_features[0] -  target_features[0])**2)
                 # loss_f2 = self.perceptual_loss_weight[1]*torch.mean((pred_features[1] -  target_features[1])**2)
                 # loss_f3 = self.perceptual_loss_weight[2]*torch.mean((pred_features[2] -  target_features[2])**2)
                 # loss_f4 = self.perceptual_loss_weight[3]*torch.mean((pred_features[3] -  target_features[3])**2)
 
-                loss_tex = 0
-                gram_pred = [gram_matrix(y) for y in pred_features]
-                gram_target = [gram_matrix(y) for y in target_features]
-                for m in range(0, len(gram_pred)):
-                    loss_tex += 1000*torch.mean((gram_pred[m] - gram_target[m])**2)
+                loss_tex = self.loss_net(pred_high, img_high)
+                # gram_pred = [gram_matrix(y) for y in pred_features]
+                # gram_target = [gram_matrix(y) for y in target_features]
+                # for m in range(0, len(gram_pred)):
+                #     loss_tex += 1000*torch.mean((gram_pred[m] - gram_target[m])**2)
                 # text_loss = sum(text_loss)
 
                 # loss = loss_pix+loss_f1+loss_f2+loss_f3+loss_f4
