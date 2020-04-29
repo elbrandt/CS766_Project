@@ -9,22 +9,24 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import numpy as np
+# from models import *
 from models import *
 from PIL import Image
 
 # Global settings
 #f_sourceLocation = "/home/amelmquist/datasets/sr"
 #f_resizeLocation = "/home/amelmquist/datasets/sr/upsampled"
-f_sourceLocation = "../../dataset/resized"
-f_inferenceLocation = "../../dataset/sr"
-g_startSize = 64
-g_endSize = 512
+f_sourceLocation = "../../testdata/resized"
+f_inferenceLocation = "../../testdata/sr_01"
 
 g_device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 torch.set_default_dtype(torch.float32)
 image_shape = (4,480,640)
+#g_model = SRNet(image_shape=image_shape,model_name="Building",device=g_device,continue_from_save=False)
 g_model = SRNet(image_shape=image_shape,device=g_device,continue_from_save=False)
 g_model.load()
+g_startSize = 64
+g_endSize = 512
 
 def ensure_dir_exists(fname):
     dirname = os.path.dirname(fname)
@@ -38,7 +40,9 @@ def inference(img):
     img_inputs = torch.from_numpy(t).to(g_device)
     prediction = g_model.test(img_inputs)
     out_img = prediction.detach().cpu().numpy().transpose((0, 2, 3, 1))[0,:,:,:]
-    out_img = (out_img * 127.5 + 127.5).astype(np.uint8)
+    out_img = (np.round(out_img * 127.5 + 127.5)).astype(np.uint8)
+    #out_img = (out_img*.5 + .5)* 255.99).astype(np.uint8)
+    
     return out_img
 
 def save_img(fname, img):

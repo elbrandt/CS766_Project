@@ -27,11 +27,20 @@ if __name__ == "__main__":
     # domain_A_dir = "/media/amelmquist/easystore/datasets/sidd/256_noise_test/"
     # domain_B_dir = "/media/amelmquist/easystore/datasets/sidd/256_noise_test/"
 
+    # asher config
     dir_64 = "/home/amelmquist/datasets/sr/Buildings/test/64/"
     # dir_128 = "/home/amelmquist/datasets/sr/Buildings/128/"
     # dir_256 = "/home/amelmquist/datasets/sr/Buildings/256/"
     dir_512 = "/home/amelmquist/datasets/sr/Buildings/test/512/"
     dir_512_up = "/home/amelmquist/datasets/sr/upsampled/Buildings/64-512/"
+
+    # eric config
+    dir_64 = "../testdata/resized/Building/64/"
+    # dir_128 = "/home/amelmquist/datasets/sr/Buildings/128/"
+    # dir_256 = "/home/amelmquist/datasets/sr/Buildings/256/"
+    dir_512 = "../testdata/resized/Building/512/"
+    dir_512_up = "../testdata/upsampled/Building/64-512/"
+    dir_512_sr = "../testdata/sr/Building/64-512/"
 
 
     data_JIT_loader = Img2ImgJITTestLoader(dir_64,dir_512,dir_512_up,paired_samples=True,num_samples=num_samples,file_type=".jpg")

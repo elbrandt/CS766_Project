@@ -7,17 +7,18 @@ import os
 import cv2
 import glob
 import skimage
-from skimage import measure
+# from skimage import measure
+import skimage.metrics as metrics
 import numpy as np
 import warnings
 import matplotlib.pyplot as plt
 
 # Global settings
 f_domain = "Building"
-f_sourceLocation = "../resized/" + f_domain + "/512"
-f_baselineLocation = "../upsampled/" + f_domain + "/64-512"
-f_srLocation = "../sr/" + f_domain + "/64-512"
-f_resultsLocation = "../sr/" + f_domain + "/512"
+f_sourceLocation = "../testdata/resized/" + f_domain + "/512"
+f_baselineLocation = "../testdata/upsampled/" + f_domain + "/64-512"
+f_srLocation = "../testdata/sr_01/" + f_domain + "/64-512"
+f_resultsLocation = "../testdata/sr_01/" + f_domain + "/512"
 
 def ensure_dir_exists(fname):
     dirname = os.path.dirname(fname)
@@ -29,21 +30,22 @@ def compare_imgs(im1, im2, fil_out):
         warnings.simplefilter("ignore") # ignore skimage's deprecation warinings.
         
         # structural similarity index
-        [ssim, im] = measure.compare_ssim(im1, im2, gaussian_weights=True, sigma=1.5, use_sample_covariance=False, multichannel=True, full=True)
-        if fil_out:
-            im8 = skimage.img_as_ubyte(np.clip(im, -1.0, 1.0))
-            save_img(fil_out, im8)
-
+        ss = metrics.structural_similarity(im1,im2,multichannel=True)
+        # [ssim, im] = measure.compare_ssim(im1, im2, gaussian_weights=True, sigma=1.5, use_sample_covariance=False, multichannel=True, full=True)
+        # if fil_out:
+        #     im8 = skimage.img_as_ubyte(np.clip(im, -1.0, 1.0))
+        #     save_img(fil_out, im8)
+# 
         # mean square error
-        mse = measure.compare_mse(im1, im2)
-
+        mse = metrics.mean_squared_error(im1, im2)
+# 
         # normalized root mean squared error
-        nrmse = measure.compare_nrmse(im1, im2)
-
+        nrmse = metrics.normalized_root_mse(im1, im2)
+# 
         # peak signal-to-noise ratio
-        psnr = measure.compare_psnr(im1, im2)
+        psnr = metrics.peak_signal_noise_ratio(im1, im2)
 
-        return [ssim, mse, nrmse, psnr]
+        return [ss, mse, nrmse, psnr]
 
 def plot_results(stats):
     fig = plt.figure()
