@@ -14,14 +14,15 @@ import skimage.metrics as metrics
 import numpy as np
 import warnings
 import matplotlib.pyplot as plt
+import shutil
 from PIL import Image
 from models import *
-import shutil
 
 # Global settings
 g_modelsFolder = "models/"
 g_orig_size = 512
 g_small_size = 64
+g_num_files = 100 # 100 files per domain
 g_upscale_factor = str(g_small_size) + "-" + str(g_orig_size)
 
 # original files are in ../testdata/resized/[domain]/512"
@@ -91,24 +92,36 @@ def compare_imgs(im1, im2, fil_out):
 
         return [ss, mse, nrmse, psnr]
 
-def plot_results(stats):
-    fig = plt.figure()
-    axs = fig.subplots(2, 2)
-    titles = ["Structural Similarity Index", "Mean Square Error", "Normalized Mean Square Error", "Peak SNR"]
-    n = 0
-    for r in range(2): 
-        for c in range(2):
-            ax = axs[r,c]
-            ax.plot(stats[:,n], label="Linear interp. upscale")
-            ax.plot(stats[:,n+4], label="Super Resolution")
-            ax.set_title(titles[n])
-            n = n + 1
-    fig.suptitle(f_domain)
-    handles, labels = ax.get_legend_handles_labels()
-    fig.legend(handles, labels, loc='lower right')
-    plt.show()
+def read_data():
+    data = dict()
+    fname = os.path.join(g_srLocation, "data.csv")
+    if os.path.isfile(fname):
+        with open(fname, 'r') as f:
+            lin_num = 0
+            for lin in f:
+                lin_num = lin_num + 1
+                if lin_num == 1:  # skip header
+                    continue
+                lst = lin.split(',')
+                model = lst[0]
+                domain = lst[1]
+                filnum = int(lst[2])
+                ssim = float(lst[3])
+                if not model in data: # model
+                    data[model] = dict()
+                if not domain in data[model]:  # domain
+                    data[model][domain] = np.zeros(g_num_files)
+                data[model][domain][filnum] = ssim
+    return data
 
-#def compare_using_model(model, files):
+def write_data(data):
+    fname = os.path.join(g_srLocation, "data.csv")
+    with open(fname, 'w') as ws:
+        ws.write("model,domain,filnum,ssim\n")
+        for model_name, domains in data.items():
+            for domain_name, fils in domains.items():
+                for f in range(len(fils)):
+                    ws.write("{},{},{},{}\n".format(model_name, domain_name, f, fils[f]))
 
 def main():
     """main function"""    
@@ -117,83 +130,61 @@ def main():
     domain_names = get_domain_list()
 
     # delete existing
-    if os.path.isdir(g_srLocation):
-        shutil.rmtree(g_srLocation)
+    #if os.path.isdir(g_srLocation):
+    #    shutil.rmtree(g_srLocation)
 
     # make a list of all the files to be processed.
     fils = dict()
     for domain_name in domain_names:
         fils[domain_name] = [os.path.basename(f) for f in glob.glob(os.path.join(g_origLocation, domain_name, str(g_orig_size), "*.jpg"))]
 
-    stats = np.zeros([len(model_names), len(domain_names), len(fils[domain_names[0]]), 2]) # assume all domains have same num of files
-    means = np.zeros([len(model_names), len(domain_names), 2]) # assume all domains have same num of files
+    data = read_data()
 
-    for m in range(len(model_names)):
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore") # ignore skimage's deprecation warinings.
-            model_name = model_names[m]
-            model = SRNet(image_shape=(64,64,3),device=g_device,continue_from_save=False)
-            model.load(os.path.join(g_modelsFolder, model_name))
-            for d in range(len(domain_names)):
-                domain_name = domain_names[d]
-                sr_path = os.path.join(g_srLocation, model_name, domain_name, g_upscale_factor)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore") # ignore skimage's deprecation warinings.
+
+        # compute upsampled image metrics
+        model_name = 'upsampling'
+        if not model_name in data:
+            data[model_name] = dict()
+            for domain_name in domain_names:
+                data[model_name][domain_name] = np.zeros(len(fils[domain_name]))
                 for f in range(len(fils[domain_name])):
                     file_name = fils[domain_name][f]
                     fname_orig = os.path.join(g_origLocation, domain_name, str(g_orig_size), file_name)
                     fname_upscale = os.path.join(g_upscaleLocation, domain_name, g_upscale_factor, file_name)
+                    img_orig = np.array(Image.open(fname_orig))
+                    img_up = np.array(Image.open(fname_upscale))
+                    metrics = compare_imgs(img_orig, img_up, None)
+                    data[model_name][domain_name][f] = metrics[0]
+
+
+        for m in range(len(model_names)):
+            model_name = model_names[m]
+            if not model_name in data:
+                data[model_name] = dict()
+
+            model = SRNet(image_shape=(64,64,3),device=g_device,continue_from_save=False)
+            model.load(os.path.join(g_modelsFolder, model_name))
+            for d in range(len(domain_names)):
+                domain_name = domain_names[d]
+                if domain_name in data[model_name]:
+                    continue
+
+                print("Infering and comparing model {} on domain {}...".format(model_name, domain_name))
+                data[model_name][domain_name] = np.zeros(len(fils[domain_name]))
+                sr_path = os.path.join(g_srLocation, model_name, domain_name, g_upscale_factor)
+                for f in range(len(fils[domain_name])):
+                    file_name = fils[domain_name][f]
+                    fname_orig = os.path.join(g_origLocation, domain_name, str(g_orig_size), file_name)
                     fname_small = os.path.join(g_origLocation, domain_name, str(g_small_size), file_name)
                     
                     img_orig = np.array(Image.open(fname_orig))
-                    img_up = np.array(Image.open(fname_upscale))
                     img_sr = inference_file(fname_small, sr_path, model)
-                    metrics_base = compare_imgs(img_orig, img_up, None)
-                    metrics_sr = compare_imgs(img_orig, img_sr, None)
-                    stats[m, d, f, 0] = metrics_base[0]
-                    stats[m, d, f, 1] = metrics_sr[0]
-                means[m, d, 0] = np.mean(stats[m, d, :, 0])
-                means[m, d, 1] = np.mean(stats[m, d, :, 1])
-                print("Domain,{},model,{},{},{}".format(domain_name, model_name, means[m,d,0], means[m,d,1]))
+                    metrics = compare_imgs(img_orig, img_sr, None)
+                    data[model_name][domain_name][f] = metrics[0]
 
-    print(stats)
-    np.save(os.path.join(g_srLocation), "stats.nparr", stats)
-    np.save(os.path.join(g_srLocation), "means.nparr", stats)
-
-    
-
-    # stats = np.empty([len(fils), 8])
-    # cnt = 0
-    # for fil in fils:
-    #     # find the corresponding file in source2Location
-    #     try:
-    #         fil_out = os.path.join(f_resultsLocation, os.path.basename(fil[0]))
-    #         im_src = cv2.imread(fil[0])
-    #         im_base = cv2.imread(fil[1])
-    #         im_sr = cv2.imread(fil[2])
-    #         metrics_base = compare_imgs(im_src, im_base, None)
-    #         metrics_sr = compare_imgs(im_src, im_sr, None)
-    #         stats[cnt,:] = metrics_base + metrics_sr
-    #         # print("{}: {}".format(os.path.basename(fil[0]), metrics))
-    #     except Exception as ex:
-    #         # store the errors in a list, to make it easier to see how things finished
-    #         errors.append((fil[0], ex))
-    #         print(f" error: {ex}")
-    #     cnt = cnt + 1
-
-    # plot_results(stats)
-
-    # # print out the list of errors at the end
-    # cnt = 1
-    # print(f"{len(errors)} errors occurred.")
-    # for err in errors:
-    #     print(f"Error {cnt}: ({err[0]}) {err[1]}")
-    #     cnt = cnt + 1
-
-    # means = np.mean(stats, axis=0)
-    # stddevs = np.std(stats, axis=0)
-    # print(means)
-    # print(stddevs)
-
-    # np.savetxt(os.path.join(f_resultsLocation, 'stats.csv'), stats, delimiter=',')
+    write_data(data)
 
 if __name__ == '__main__':
     main()
