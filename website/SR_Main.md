@@ -14,26 +14,17 @@ The purpose of this project is to explore and better understand image super-reso
   - [UW Madison CS766 - Computer Vision, Spring 2020](#uw-madison-cs766---computer-vision-spring-2020)
   - [Overview](#overview)
   - [Table of Contents](#table-of-contents)
-    - [Introduction](#introduction)
-    - [Building the SR Network](#building-the-sr-network)
-      - [Training Dataset](#training-dataset)
-      - [Network Structure](#network-structure)
-    - [Subjective Super-Resolution Results](#subjective-super-resolution-results)
-    - [Domain Specific Training and Inferencing](#domain-specific-training-and-inferencing)
-      - [Objective Performance Measure - SSIM](#objective-performance-measure---ssim)
-      - [Domain Specific Trainng Results](#domain-specific-trainng-results)
-    - [Image Segmentation of Super-Resolution Images](SR_Segmentation.md)
-    - [Conclusion](#conclusion)
-    - [References](#references)
+    - [Introduction](SR_Introduction.md)
+    - [Building the SR Network](SR_Building.md)
+      - [Training Dataset](SR_Building.md#training-dataset)
+      - [Network Structure](SR_Building.md#network-structure)
+    - [Inferencing Results](SR_Results.md)
+      - [Subjective Super-Resolution Results](SR_Results.md#subjective-super-resolution-results)
+      - [Objective Performance Measure - SSIM](SR_Results.md#objective-performance-measure---ssim)
+    - [Domain Specific Training and Inferencing](SR_DomainSpecific.md)
+    - [SR and Image Segmentation](SR_Segmentation.md)
+    - [Conclusion](SR_Conclusion.md)
+      - [Future Work](SR_Conclusion.md#future-work)
+      - [References](SR_Conclusion.md#references)
 
-### Introduction
-### Building the SR Network
-#### Training Dataset
-#### Network Structure
-### Subjective Super-Resolution Results
-### Domain Specific Training and Inferencing
-#### Objective Performance Measure - SSIM
-#### Domain Specific Trainng Results
-
-### Conclusion
-### References
+|Prev: [Main](SR_Main.md) | Up: [Main](SR_Main.md) | Next: [Introduction](SR_Introduction.md) |

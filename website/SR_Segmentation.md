@@ -43,3 +43,5 @@ dog.
 <img src="images/segmentation/seg_23.png" width="300">
 <img src="images/segmentation/seg_24.png" width="300">
 <img src="images/segmentation/seg_41.png" width="300">
+
+|Prev: [Domain Specific Training and Inferencing](SR_DomainSpecific.md) | Up: [Main](SR_Main.md) | Next: [Conclusion](SR_Conclusion.md) |
