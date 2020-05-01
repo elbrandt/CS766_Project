@@ -11,7 +11,7 @@ Eric Brandt (```elbrandt@wisc.edu```)
 The purpose of this project is to explore and better understand image super-resolution. We begin by preparing a large, high resolution, labeled training data set annd then implementing and training a convolutional neural network for super-resolution based on the current state of the art literature. After assessing the subjective quality of the inferencing of the network we created and trained, we probe its characteristics with two specific investigations. First, we explore the 'domain sensitivity' to both the training and the inferencing of the network using objective performance measures. Second, we explore the utility of super-resolution inferencing to downstream image processing tasks, using the specific example of image segmentation. 
 
 ## Final Project Website
-The final project website can be found [here](https://github.com/elbrandt/CS766_Project/website/SR_Main.md).
+The final project website can be found [here](https://elbrandt.github.io/CS766_Project/website/SR_Main).
 
 ## Final Project Presentation
 The final project website can be found ...
