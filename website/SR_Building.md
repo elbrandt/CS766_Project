@@ -1,8 +1,7 @@
 # Super Resolution Image Enhancement
 ###### UW Madison CS766 - Computer Vision, Spring 2020
 
-| Asher Elmquist (```amelmquist@wisc.edu```) | Eric Brandt (```elbrandt@wisc.edu```) |
-
+| Asher Elmquist (```amelmquist@wisc.edu```) || Eric Brandt (```elbrandt@wisc.edu```) |
 |Prev: [Introduction](SR_Introduction.md) | Up: [Main](SR_Main.md) | Next: [Inferencing Results](SR_Results.md) |
 
 # Building the Super Resolution Network
