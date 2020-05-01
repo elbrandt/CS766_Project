@@ -1,6 +1,7 @@
 code/saved_models/
 code/progress*
 code/results*
+code/models*
 
 dataset/downloads*
 dataset/comparison*
@@ -10,3 +11,4 @@ dataset/resized*
 *.pyc
 dataset/*
 testdata/*
+code/models/Building

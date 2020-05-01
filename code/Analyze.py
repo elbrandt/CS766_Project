@@ -69,11 +69,15 @@ def chart_mean(model_names, domain_names, means):
         for m in range(len(model_names)):
             print("[{}-{}]\n".format(d + offsets[m], d+offsets[m]+dx))
             ax.bar(d + offsets[m], means[m,d], width=dx, color="C{}".format(m))
-    ax.legend(labels=model_names, loc='lower right')
-    ax.set_ylabel("ssim")
+    #ax.legend(labels=model_names, loc='lower right')
+    ax.legend(labels=model_names, bbox_to_anchor=(1.05, 1))
+    ax.set_xlabel("Image Domain")
+    ax.set_ylabel("Structural Similarity, Normalized to 'upsampling'=1.0")
     ax.set_xticks([0, 1, 2, 3])
     ax.set_xticklabels(domain_names)
     ax.set_title("Structural Similarity Index by Model and Domain")
+    ax.set_ylim([0.9, 1.10])
+    plt.tight_layout()
     plt.show()
 
 def main():
@@ -81,16 +85,31 @@ def main():
 
     data = read_data()
 
-    model_names = list(data.keys())
+    #model_names = list(data.keys())
+    #model_names = ["upsampling", "Food_200", "Food_239", "Food_334", "Food_386", "Food_596", "Food_726"]
+    #model_names = ["upsampling", "Flower_140", "Flower_165", "Flower_253", "Flower_308"]
+    #model_names = ["upsampling", "Dog_140", "Dog_162", "Dog_248", "Dog_302"]
+    #model_names = ["upsampling", "Building_200", "Building_317", "Building_380", "Building_631", "Building_787"]
+    model_names = ["upsampling", "Building_380", "Dog_248", "Flower_308", "Food_726"]
     num_models = len(model_names)
     domain_names = ["Food", "Dog", "Building", "Flower"]
     num_domains = len(domain_names)
 
     # calculate means
     means = np.zeros([num_models, num_domains])
+    m_upsampling = -1
     for m in range(num_models):
         for d in range(num_domains):
             means[m, d] = np.mean(data[model_names[m]][domain_names[d]])
+        if model_names[m] == 'upsampling':
+            m_upsampling = m
+    
+    # normalize
+    for d in range(num_domains):
+        divisor = means[m_upsampling, d]
+        for m in range(num_models):
+            means[m, d] = means[m, d] / divisor
+
 
     chart_mean(model_names, domain_names, means)
         

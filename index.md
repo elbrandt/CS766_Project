@@ -8,11 +8,16 @@ Eric Brandt (```elbrandt@wisc.edu```)
 
 ### Overview
 
-The purpose of this project is to explore image super-resolution and understand how creating higher resolution or higher quality pictures can assist in downstream tasks such as object recognition or image segmentation. To understand the effect of super-resolution, we propose implementing a convolutional neural network for super-resolution based on the current state of the art. Beyond recreation of a current algorithm, we will study the general nature of the trained model, and explore the application of super-resolution in object detection accuracy and precision.
+The purpose of this project is to explore and better understand image super-resolution. We begin by preparing a large, high resolution, labeled training data set annd then implementing and training a convolutional neural network for super-resolution based on the current state of the art literature. After assessing the subjective quality of the inferencing of the network we created and trained, we probe its characteristics with two specific investigations. First, we explore the 'domain sensitivity' to both the training and the inferencing of the network using objective performance measures. Second, we explore the utility of super-resolution inferencing to downstream image processing tasks, using the specific example of image segmentation. 
 
+## Final Project Website
+The final project website can be found [here](https://github.com/elbrandt/CS766_Project/website/SR_Main.md).
+
+## Final Project Presentation
+The final project website can be found ...
 
 ## Mid-Project Report
-A .pdf of the Mid-Project Report  with in-progress results can be foubnd [here](https://github.com/elbrandt/CS766_Project/blob/master/mid-term/CS766_ElmquistBrandt_Super_Resolution_Image_Enhancement_MidTerm.pdf).
+A .pdf of the Mid-Project Report  with in-progress results can be found [here](https://github.com/elbrandt/CS766_Project/blob/master/mid-term/CS766_ElmquistBrandt_Super_Resolution_Image_Enhancement_MidTerm.pdf).
 
 ## Mid-Term Example Results
 ![Food1](https://raw.githubusercontent.com/elbrandt/CS766_Project/master/mid-term/source/midterm_results/test_img_0.png)
