@@ -67,12 +67,11 @@ def chart_mean(model_names, domain_names, means):
     offsets = np.linspace(-0.4 + dx/2, 0.4 - dx/2, nmodels) 
     for d in range(len(domain_names)):
         for m in range(len(model_names)):
-            print("[{}-{}]\n".format(d + offsets[m], d+offsets[m]+dx))
             ax.bar(d + offsets[m], means[m,d], width=dx, color="C{}".format(m))
     #ax.legend(labels=model_names, loc='lower right')
     ax.legend(labels=model_names, bbox_to_anchor=(1.05, 1))
     ax.set_xlabel("Image Domain")
-    ax.set_ylabel("Structural Similarity, Normalized to 'upsampling'=1.0")
+    ax.set_ylabel("Normalized Structural Similarity (upsampling=1.0)")
     ax.set_xticks([0, 1, 2, 3])
     ax.set_xticklabels(domain_names)
     ax.set_title("Structural Similarity Index by Model and Domain")
@@ -86,11 +85,12 @@ def main():
     data = read_data()
 
     #model_names = list(data.keys())
-    #model_names = ["upsampling", "Food_200", "Food_239", "Food_334", "Food_386", "Food_596", "Food_726"]
-    #model_names = ["upsampling", "Flower_140", "Flower_165", "Flower_253", "Flower_308"]
-    #model_names = ["upsampling", "Dog_140", "Dog_162", "Dog_248", "Dog_302"]
-    #model_names = ["upsampling", "Building_200", "Building_317", "Building_380", "Building_631", "Building_787"]
-    model_names = ["upsampling", "Building_380", "Dog_248", "Flower_308", "Food_726"]
+    #model_names = ["upsampling", "Food_200", "Food_239", "Food_334", "Food_386", "Food_596", "Food_726", "Food_983"]
+    #model_names = ["upsampling", "Flower_140", "Flower_165", "Flower_253", "Flower_308", "Flower_416"]
+    #model_names = ["upsampling", "Dog_140", "Dog_162", "Dog_248", "Dog_302", "Dog_409"]
+    #model_names = ["upsampling", "Building_200", "Building_317", "Building_380", "Building_631", "Building_787", "Building_1094"]
+    #model_names = ["upsampling", "Building_24k_92", "Building_24k_205", "Building_24k_274", "Building_24k_411"]
+    model_names = ["upsampling", "Building_1094", "Dog_248", "Flower_416", "Food_726", "Building_24k_274"]
     num_models = len(model_names)
     domain_names = ["Food", "Dog", "Building", "Flower"]
     num_domains = len(domain_names)
