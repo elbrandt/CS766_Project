@@ -16,7 +16,7 @@ with the highest SSIM was used as the upsampling network in this experiment.
 Here are the error rates when using direct upsampling vs the SR network (lower
 is better).
 
-| Metric    | Upsampled | SR      |
+| Metric    | Upsampled Error Rate | SR Error Rate     |
 | :------:  | :-----:   | :-----: |
 | FCN       | 20.0%     | 25.8%   |
 | DeepLabV3 | 13.5%     | 26.4%   |
