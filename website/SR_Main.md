@@ -2,12 +2,12 @@
 ## UW Madison CS766 - Computer Vision, Spring 2020
 
 Asher Elmquist (```amelmquist@wisc.edu```)
- 
+
 Eric Brandt (```elbrandt@wisc.edu```)
 
 ## Overview
 
-The purpose of this project is to explore and better understand image super-resolution. We begin by preparing a large, high resolution, labeled training data set annd then implementing and training a convolutional neural network for super-resolution based on the current state of the art literature. After assessing the subjective quality of the inferencing of the network we created and trained, we probe its characteristics with two specific investigations. First, we explore the 'domain sensitivity' to both the training and the inferencing of the network using objective performance measures. Second, we explore the utility of super-resolution inferencing to downstream image processing tasks, using the specific example of image segmentation. 
+The purpose of this project is to explore and better understand image super-resolution. We begin by preparing a large, high resolution, labeled training data set annd then implementing and training a convolutional neural network for super-resolution based on the current state of the art literature. After assessing the subjective quality of the inferencing of the network we created and trained, we probe its characteristics with two specific investigations. First, we explore the 'domain sensitivity' to both the training and the inferencing of the network using objective performance measures. Second, we explore the utility of super-resolution inferencing to downstream image processing tasks, using the specific example of image segmentation.
 
 ## Table of Contents
 - [Super Resolution Image Enhancement](#super-resolution-image-enhancement)
@@ -35,5 +35,10 @@ The purpose of this project is to explore and better understand image super-reso
 #### Objective Performance Measure - SSIM
 #### Domain Specific Trainng Results
 ### Image Segmentation of Super-Resolution Images
+
+[Segmentation](segmentation.md#Image)
+
+
+
 ### Conclusion
 ### References
