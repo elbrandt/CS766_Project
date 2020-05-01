@@ -22,7 +22,7 @@ The purpose of this project is to explore and better understand image super-reso
     - [Domain Specific Training and Inferencing](#domain-specific-training-and-inferencing)
       - [Objective Performance Measure - SSIM](#objective-performance-measure---ssim)
       - [Domain Specific Trainng Results](#domain-specific-trainng-results)
-    - [Image Segmentation of Super-Resolution Images](#image-segmentation-of-super-resolution-images)
+    - [Image Segmentation of Super-Resolution Images](SR_Segmentation.md)
     - [Conclusion](#conclusion)
     - [References](#references)
 
@@ -34,11 +34,6 @@ The purpose of this project is to explore and better understand image super-reso
 ### Domain Specific Training and Inferencing
 #### Objective Performance Measure - SSIM
 #### Domain Specific Trainng Results
-### Image Segmentation of Super-Resolution Images
-
-[Segmentation](segmentation.md#Image)
-
-
 
 ### Conclusion
 ### References
