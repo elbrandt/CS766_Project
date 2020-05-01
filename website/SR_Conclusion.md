@@ -15,4 +15,4 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
 
 |Prev: [SR and Image Segmentation](SR_Segmentation.md) | Up: [Main](SR_Main.md) | Next: [Conclusion](SR_Conclusion.md) |
 
-| Asher Elmquist (```amelmquist@wisc.edu```) | Eric Brandt (```elbrandt@wisc.edu```) |
+Asher Elmquist (```amelmquist@wisc.edu```), Eric Brandt (```elbrandt@wisc.edu```) 2020

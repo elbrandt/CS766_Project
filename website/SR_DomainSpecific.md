@@ -8,4 +8,4 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
 
 |Prev: [Inferencing Results](SR_Results.md) | Up: [Main](SR_Main.md) | Next: [SR and Image Segmentation](SR_Segmentation.md) |
 
-| Asher Elmquist (```amelmquist@wisc.edu```) | Eric Brandt (```elbrandt@wisc.edu```) |
+Asher Elmquist (```amelmquist@wisc.edu```), Eric Brandt (```elbrandt@wisc.edu```) 2020

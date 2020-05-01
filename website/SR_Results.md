@@ -16,4 +16,4 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
 
 |Prev: [Building the Super Resolution Network ](SR_Building.md) | Up: [Main](SR_Main.md) | Next: [Domain Specific Training and Inferencing](SR_DomainSpecific.md) |
 
-| Asher Elmquist (```amelmquist@wisc.edu```) | Eric Brandt (```elbrandt@wisc.edu```) |
+Asher Elmquist (```amelmquist@wisc.edu```), Eric Brandt (```elbrandt@wisc.edu```) 2020

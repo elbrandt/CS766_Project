@@ -1,4 +1,9 @@
-### Image Segmentation of Super-Resolution Images
+# Super Resolution Image Enhancement
+###### UW Madison CS766 - Computer Vision, Spring 2020
+
+|Prev: [Domain Specific Training and Inferencing](SR_DomainSpecific.md) | Up: [Main](SR_Main.md) | Next: [Conclusion](SR_Conclusion.md) |
+
+# Image Segmentation of Super-Resolution Images
 
 An interesting application of super-resolution would be in sub-pixel
 image segmentation. If we could effectively super-resolve to improve the image,
@@ -45,3 +50,5 @@ dog.
 <img src="images/segmentation/seg_41.png" width="300">
 
 |Prev: [Domain Specific Training and Inferencing](SR_DomainSpecific.md) | Up: [Main](SR_Main.md) | Next: [Conclusion](SR_Conclusion.md) |
+
+Asher Elmquist (```amelmquist@wisc.edu```), Eric Brandt (```elbrandt@wisc.edu```) 2020
