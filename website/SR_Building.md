@@ -7,8 +7,7 @@
 Building the Super Resolution Network consisted of 3 steps, typical of any deep neural network development. A large training data set was located and acquired. A network model and loss function was designed, coded, trained, and evaluated. The model was adjusted and retrained over several iterations to improve results.
 
 ## Training Dataset
-The training, validation, and test data for our project consists of images from the OpenImages V5 Dataset
-[[1]](SR_Conclusion.md#references) . The full data set consists of an astonishing 9 million images with a combination of human-verified and machine-generated labels. For our training, we decided to focus on training using a subset of these images. After reviewing the labels in the entire dataset, we chose four distinct labels on which to focus: ‘Building,’
+The training, validation, and test data for our project consists of images from the [OpenImages V5 Dataset](https://storage.googleapis.com/openimages/web/index.html). The full data set consists of an astonishing 9 million images with a combination of human-verified and machine-generated labels. For our training, we decided to focus on training using a subset of these images. After reviewing the labels in the entire dataset, we chose four distinct labels on which to focus: ‘Building,’
 ‘Dog,’ ‘Flower,’ and ‘Food.’ By narrowing down the scope of image content, and choosing four distinct image subjects (domains) we enable intra- and cross-label inference testing. After deciding on the appropriate images to use, the acquisition of a data set was broken down into 3 phases: image retrieval, training image preparation, and comparison image preparation.
 ### Image Retrieval
 Simply managing the process of acquiring the images was a formidable task. For example, the ```.csv``` file
@@ -18,8 +17,7 @@ script ([Retriever.py](https://github.com/elbrandt/CS766_Project/blob/master/dat
 
 ### Training Image Preparation
 Once a sufficient number of candidate images having each label were downloaded, we prepared the images
-using a second Python script ([Resizer.py](https://github.com/elbrandt/CS766_Project/blob/master/dataset/Retriever/Resizer.py)). Using OpenCV [[2]](SR_Conclusion.md#references), this script opened each image and performed
-the following operations:
+using a second Python script ([Resizer.py](https://github.com/elbrandt/CS766_Project/blob/master/dataset/Retriever/Resizer.py)). Using [OpenCV](https://opencv.org/), this script opened each image and performed the following operations:
 1. If the image had a resolution under 2048x2048, the image was discarded from the training set. We are
 only interested in high resolution images.
 2. The image was center-cropped to 2048x2048, to match the input dimensions of our training network.
