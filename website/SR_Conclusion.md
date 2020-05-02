@@ -14,6 +14,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
 All references and citations in this project and website are live links embedded in-line in pages of this site. A formal, formatted bibliography can be found at the end of the mid-term project report [here](https://github.com/elbrandt/CS766_Project/blob/master/mid-term/CS766_ElmquistBrandt_Super_Resolution_Image_Enhancement_MidTerm.pdf).
 
 ---
+
 |Prev: [SR and Image Segmentation](SR_Segmentation.md) | Up: [Main](SR_Main.md) | Next: [Conclusion](SR_Conclusion.md) |
 
 Asher Elmquist (```amelmquist@wisc.edu```), Eric Brandt (```elbrandt@wisc.edu```) 2020

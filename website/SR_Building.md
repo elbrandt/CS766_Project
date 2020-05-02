@@ -74,6 +74,7 @@ The full loss function is given by:
 where x and y are the prediction and target images.
 
 ---
+
 |Prev: [Introduction](SR_Introduction.md) | Up: [Main](SR_Main.md) | Next: [Inferencing Results](SR_Results.md) |
 
 Asher Elmquist (```amelmquist@wisc.edu```), Eric Brandt (```elbrandt@wisc.edu```) 2020

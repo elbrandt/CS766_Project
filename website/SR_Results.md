@@ -31,6 +31,7 @@ Using SSIM as our metric for objective comparison, we evaluated our 400 test ima
 TODO: SSIM Bar Chart of Upsampled vs SR across 4 domains
 
 ---
+
 |Prev: [Building the Super Resolution Network ](SR_Building.md) | Up: [Main](SR_Main.md) | Next: [Domain Specific Training and Inferencing](SR_DomainSpecific.md) |
 
 Asher Elmquist (```amelmquist@wisc.edu```), Eric Brandt (```elbrandt@wisc.edu```) 2020

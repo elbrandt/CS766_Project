@@ -50,5 +50,6 @@ dog.
 <img src="images/segmentation/seg_41.png" width="300">
 
 ---
+
 |Prev: [Domain Specific Training and Inferencing](SR_DomainSpecific.md) | Up: [Main](SR_Main.md) | Next: [Conclusion](SR_Conclusion.md) |
 Asher Elmquist (```amelmquist@wisc.edu```), Eric Brandt (```elbrandt@wisc.edu```) 2020

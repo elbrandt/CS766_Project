@@ -28,4 +28,5 @@ The purpose of this project is to explore and better understand image super-reso
       - [References](SR_Conclusion.md#references)
 
 ---
+
 |Prev: [Main](SR_Main.md) | Up: [Main](SR_Main.md) | Next: [Introduction](SR_Introduction.md) |
