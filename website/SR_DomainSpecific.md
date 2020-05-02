@@ -22,8 +22,74 @@ After training and monitoring the progress of all four CNN models, we compared t
   <img src="images/results/domain_transfer.png">
 </p>
 
+### Statistical Analysis
 
+We have shown in the [Objective Results](SR_Results.md#objective-performance-measure---ssim) section that the SSIM gain of SR images over baseline 'linear interpolation upscaling' images is statistically significant (p < 0.001).  
 
+The question now because, is there any statistical significance to the domain-specific training, and domain-specific inferencing using a particular trained model. To answer this question, we again draw upong the Student-T test. Each row table below is based on a particular CNN model, trained only on a particular class of images. Each colum represents a class of images that the model was tested on. The p-value in each entry is the statistical significance of the trained model inferencing a given image domain *in comparison to* using that model to inference images of the domain on which it is trained.  
+
+For example, in the first row, second column, we can conclude that the performance of the Building-trained Model on Buildings versus its performance on Dogs *is* statistically significant (p < 0.001).  However, the Dog-trained Model's performance on Dogs versus its performance on Flowers (row 2, column 3, p=0.512) is really no better than random chance.
+
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+  overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+  font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg .tg-fn5d{border-color:inherit;color:rgb(0, 0, 0);text-align:left;vertical-align:middle}
+.tg .tg-baqh{text-align:center;vertical-align:top}
+.tg .tg-omgv{border-color:inherit;color:rgb(0, 0, 0);text-align:center;vertical-align:middle}
+.tg .tg-lu0m{color:rgb(0, 0, 0);text-align:left;vertical-align:top}
+.tg .tg-0lax{text-align:left;vertical-align:top}
+.tg .tg-exjq{color:rgb(0, 0, 0);text-align:left;vertical-align:middle}
+</style>
+<table class="tg">
+  <tr>
+    <th class="tg-0lax"></th>
+    <th class="tg-baqh" colspan="5">Image Domain</th>
+  </tr>
+  <tr>
+    <td class="tg-0lax"></td>
+    <td class="tg-lu0m"><br></td>
+    <td class="tg-exjq">Building</td>
+    <td class="tg-exjq">Dog</td>
+    <td class="tg-exjq">Flower</td>
+    <td class="tg-exjq">Food</td>
+  </tr>
+  <tr>
+    <td class="tg-baqh" rowspan="4"><br>Training<br>Model</td>
+    <td class="tg-fn5d">Building</td>
+    <td class="tg-omgv">N/A</td>
+    <td class="tg-omgv">&lt; 0.001</td>
+    <td class="tg-omgv">0.008</td>
+    <td class="tg-omgv">&lt; 0.001</td>
+  </tr>
+  <tr>
+    <td class="tg-fn5d">Dog</td>
+    <td class="tg-omgv">&lt; 0.001</td>
+    <td class="tg-omgv">N/A</td>
+    <td class="tg-omgv">0.512</td>
+    <td class="tg-omgv">0.005</td>
+  </tr>
+  <tr>
+    <td class="tg-fn5d">Flower</td>
+    <td class="tg-omgv">0.400</td>
+    <td class="tg-omgv">0.051</td>
+    <td class="tg-omgv">N/A</td>
+    <td class="tg-omgv">0.609</td>
+  </tr>
+  <tr>
+    <td class="tg-fn5d">Food</td>
+    <td class="tg-omgv">0.232</td>
+    <td class="tg-omgv">&lt; 0.001</td>
+    <td class="tg-omgv">0.572</td>
+    <td class="tg-omgv">N/A</td>
+  </tr>
+</table>
+
+###### Table: p-values of Domain-specific models inferencing on their own image types versus other image types
+
+In some cases, we can clearly say that a particular CNN is better suited for inferencing certain types of images, but we cannot make a generalized statement that this is always the case.  However, a takeaway recommendation is that *it can make a difference*, and if one planse to use SR techniques for a very specific application, it does make sense to take the subject matter of the data into account during the training phase, simply using a pre-trained open-source SR model may not give the best performance in highly domain-spefific applications.
 
 ---
 
