@@ -14,7 +14,7 @@ The segmentation results were compared using segmentation on the high resolution
 | FCN       | 20.0%     | 25.8%   |
 | DeepLabV3 | 13.5%     | 26.4%   |
 
-There also seems not to be a strong correlation that would suggest an improvement in SSIM would lead to improvement in segmentation. The results of segementation vs SSIM are shown here:
+There also seems not to be a strong correlation that would suggest an improvement in SSIM would lead to improvement in segmentation. The results of segmentation vs SSIM are shown here:
 
 <center>
 <img src="images/segmentation/segment_vs_ssim.png" width="400">
