@@ -30,4 +30,4 @@ The purpose of this project is to explore and better understand image super-reso
 
 ---
 
-|Prev: [Main](SR_Main.md) | Up: [Main](SR_Main.md) | Next: [Introduction](SR_Introduction.md) |
+| Up: [Main](SR_Main.md) | Next: [Introduction](SR_Introduction.md) |
