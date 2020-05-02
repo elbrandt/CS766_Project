@@ -15,6 +15,7 @@ import numpy as np
 import warnings
 import matplotlib.pyplot as plt
 import shutil
+from scipy import stats
 from PIL import Image
 from models import *
 
@@ -79,6 +80,19 @@ def chart_mean(model_names, domain_names, means):
     plt.tight_layout()
     plt.show()
 
+
+def t_test(model_name1, domain_name1, model_name2, domain_name2, data):
+    d1 = data[model_name1][domain_name1]
+    d2 = data[model_name2][domain_name2]
+    t, p = stats.ttest_ind(d1, d2)
+    print("({},{}) to ({},{}): p value={}".format(model_name1, domain_name1, model_name2, domain_name2, p))
+
+def t_tests(model_names, domain_names, data):
+    for m1 in ['upsampling']:
+        for d1 in domain_names:
+            for m2 in model_names:
+                t_test(m1, d1, m2, d1, data)
+
 def main():
     """main function"""    
 
@@ -90,7 +104,8 @@ def main():
     #model_names = ["upsampling", "Dog_140", "Dog_162", "Dog_248", "Dog_302", "Dog_409"]
     #model_names = ["upsampling", "Building_200", "Building_317", "Building_380", "Building_631", "Building_787", "Building_1094"]
     #model_names = ["upsampling", "Building_24k_92", "Building_24k_205", "Building_24k_274", "Building_24k_411"]
-    model_names = ["upsampling", "Building_1094", "Dog_248", "Flower_416", "Food_726", "Building_24k_274"]
+    #model_names = ["upsampling", "Building_1094", "Dog_248", "Flower_416", "Food_726", "Building_24k_274"]
+    model_names = ["upsampling", "Building_1094", "Dog_248", "Flower_416", "Food_726"]
     num_models = len(model_names)
     domain_names = ["Food", "Dog", "Building", "Flower"]
     num_domains = len(domain_names)
@@ -109,11 +124,12 @@ def main():
         divisor = means[m_upsampling, d]
         for m in range(num_models):
             means[m, d] = means[m, d] / divisor
+            data[model_names[m]][domain_names[d]] = data[model_names[m]][domain_names[d]] / divisor
 
 
     chart_mean(model_names, domain_names, means)
+
+    t_tests(model_names, domain_names, data)
         
-
-
 if __name__ == '__main__':
     main()
