@@ -28,7 +28,10 @@ Many algorithmic metrics to compute the similarity of two images have been used 
 
 Using SSIM as our metric for objective comparison, we evaluated our 400 test images across the four image domains. First, we calculated the SSIM of our linear interpolation upsampled images with respect to the original high-resolution image. This served as our baseline. We then calculated the SSIM of our SR inferenced image.  To make comparison easier, we developed a 'Normalized SSIM' metric that first normalizes the SSIM performance of the upsampled images to 1.0, and then scaled the SR image's SSIM metric relative to that. This allows our metric values to be interpreted, roughly speaking, as a 'percentage improvement' over the baseline method. That is, if the SR method scores a 1.1 in our 'Normalized SSIM', then it is performing 10% better than linear interpolation upsampling under the SSIM metric.
 
-TODO: SSIM Bar Chart of Upsampled vs SR across 4 domains
+This bar chart shows the SR Net's performance against 100 test images in each of 4 domains. These differences are statistically significant (p < 0.001) in all cases.
+<p align="center">
+  <img src="images/results/sr_performance.png">
+</p>
 
 ---
 

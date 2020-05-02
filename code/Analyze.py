@@ -61,7 +61,7 @@ def read_data():
                 data[model][domain][filnum] = ssim
     return data
 
-def chart_mean(model_names, domain_names, means):
+def chart_mean(model_names, domain_names, means, legend_names):
     fig,ax = plt.subplots()
     nmodels = len(model_names)
     dx = 0.8 / nmodels
@@ -70,7 +70,9 @@ def chart_mean(model_names, domain_names, means):
         for m in range(len(model_names)):
             ax.bar(d + offsets[m], means[m,d], width=dx, color="C{}".format(m))
     #ax.legend(labels=model_names, loc='lower right')
-    ax.legend(labels=model_names, bbox_to_anchor=(1.05, 1))
+    if not legend_names:
+        legend_names = model_names
+    ax.legend(labels=legend_names, bbox_to_anchor=(1.05, 1))
     ax.set_xlabel("Image Domain")
     ax.set_ylabel("Normalized Structural Similarity (upsampling=1.0)")
     ax.set_xticks([0, 1, 2, 3])
@@ -88,10 +90,13 @@ def t_test(model_name1, domain_name1, model_name2, domain_name2, data):
     print("({},{}) to ({},{}): p value={}".format(model_name1, domain_name1, model_name2, domain_name2, p))
 
 def t_tests(model_names, domain_names, data):
-    for m1 in ['upsampling']:
-        for d1 in domain_names:
-            for m2 in model_names:
-                t_test(m1, d1, m2, d1, data)
+    midx = 1
+    for m1 in model_names[1:]:
+        for d1 in [domain_names[midx-1]]:
+            for m2 in [m1]:
+                for d2 in domain_names:
+                    t_test(m1, d1, m2, d2, data)
+        midx = midx + 1
 
 def main():
     """main function"""    
@@ -105,9 +110,11 @@ def main():
     #model_names = ["upsampling", "Building_200", "Building_317", "Building_380", "Building_631", "Building_787", "Building_1094"]
     #model_names = ["upsampling", "Building_24k_92", "Building_24k_205", "Building_24k_274", "Building_24k_411"]
     #model_names = ["upsampling", "Building_1094", "Dog_248", "Flower_416", "Food_726", "Building_24k_274"]
-    model_names = ["upsampling", "Building_1094", "Dog_248", "Flower_416", "Food_726"]
+    #model_names = ["upsampling", "Building_1094", "Dog_248", "Flower_416", "Food_726"]
+    model_names = ["upsampling", "Building_24k_274"]
+    legend_names = ["Upsampling", "SR Model"]
     num_models = len(model_names)
-    domain_names = ["Food", "Dog", "Building", "Flower"]
+    domain_names = ["Building", "Dog", "Flower", "Food"]
     num_domains = len(domain_names)
 
     # calculate means
@@ -119,15 +126,20 @@ def main():
         if model_names[m] == 'upsampling':
             m_upsampling = m
     
-    # normalize
+    # normalize mean data
     for d in range(num_domains):
         divisor = means[m_upsampling, d]
         for m in range(num_models):
             means[m, d] = means[m, d] / divisor
-            data[model_names[m]][domain_names[d]] = data[model_names[m]][domain_names[d]] / divisor
 
 
-    chart_mean(model_names, domain_names, means)
+    # normalize raw data
+    for m in range(num_models-1, -1, -1): # have to go backwards to do upsampling last
+        for d in range(num_domains):
+            for v in range(100): 
+                data[model_names[m]][domain_names[d]][v] = data[model_names[m]][domain_names[d]][v] / data["upsampling"][domain_names[d]][v]
+
+    chart_mean(model_names, domain_names, means, legend_names)
 
     t_tests(model_names, domain_names, data)
         
