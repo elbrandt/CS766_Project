@@ -14,9 +14,9 @@ For subjective SR results of our network, we let the images speak for themselves
   <img src="images/results/subjective_compare_4x4.png">
 </p>
 
-Another comparison view of baseline to SR method is the checkerboard comparison of a representative test image shown below
-
-TODO: checkerboard image
+<p align="center">
+  <img src="images/results/subjective_compare_2x1.png">
+</p>
 
 ## Objective Performance Measure - SSIM
 
