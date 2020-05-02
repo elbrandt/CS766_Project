@@ -14,7 +14,7 @@ from skimage import data
 # original files are in ../testdata/resized/[domain]/512"
 g_origLocation = "../testdata/resized/"
 g_upscaleLocation = "../testdata/upsampled/"
-g_srLocation = "../testdata/sr/Building_1094"
+g_srLocation = "../testdata/sr/sr_all_72"
 
 g_images = [
     ( "Building", "000d6781b9abfae8.jpg" ),
