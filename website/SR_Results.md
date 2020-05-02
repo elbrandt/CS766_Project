@@ -10,7 +10,9 @@ After preparing the training data and training the CNN, the first natural questi
       
 For subjective SR results of our network, we let the images speak for themselves. Below are four rows representative test images. The columns from left to right are a) low resolution image, b) linear interpolation upsampling of low resolution image to high resolution, c) Super Resolution inferencing of low resolution image to high resolution, and d) original high resolution image
 
-TODO: 4 images using aggregate model
+<p align="center">
+  <img src="images/results/subjective_compare_4x4.png">
+</p>
 
 Another comparison view of baseline to SR method is the checkerboard comparison of a representative test image shown below
 
