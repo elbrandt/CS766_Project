@@ -23,17 +23,17 @@ There also seems not to be a strong correlation that would suggest an improvemen
 Here are some interesting examples showing the results of segmentation. The primary error mode is a change of class to person or other non-background class. In the segmentation map, black is background, blue is person, light green is dog.
 
 <center>
-<img src="images/segmentation/seg_0.png" width="300">
-<img src="images/segmentation/seg_1.png" width="300">
-<img src="images/segmentation/seg_3.png" width="300">
-<img src="images/segmentation/seg_5.png" width="300">
-<img src="images/segmentation/seg_7.png" width="300">
-<img src="images/segmentation/seg_10.png" width="300">
-<img src="images/segmentation/seg_13.png" width="300">
-<img src="images/segmentation/seg_15.png" width="300">
-<img src="images/segmentation/seg_23.png" width="300">
-<img src="images/segmentation/seg_24.png" width="300">
-<img src="images/segmentation/seg_41.png" width="300">
+<img src="images/segmentation/seg_0.png" width="400">
+<img src="images/segmentation/seg_1.png" width="400">
+<img src="images/segmentation/seg_3.png" width="400">
+<img src="images/segmentation/seg_5.png" width="400">
+<img src="images/segmentation/seg_7.png" width="400">
+<img src="images/segmentation/seg_10.png" width="400">
+<img src="images/segmentation/seg_13.png" width="400">
+<img src="images/segmentation/seg_15.png" width="400">
+<img src="images/segmentation/seg_23.png" width="400">
+<img src="images/segmentation/seg_24.png" width="400">
+<img src="images/segmentation/seg_41.png" width="400">
 </center>
 ---
 

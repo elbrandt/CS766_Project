@@ -95,7 +95,7 @@ For example, in the first row, second column, we can conclude that the performan
 
 ###### Table: p-values of Domain-specific models inferencing on their own image types versus other image types
 
-In many cases, we can clearly say that a domain-specific CNN is better suited for inferencing certain types of images, but we cannot make a generalized statement that this is always the case.  However, a takeaway recommendation is that *it can make a difference*, and if one planse to use SR techniques for a very specific application, it does make sense to take the subject matter of the data into account during the training phase, simply using a pre-trained open-source SR model may not give the best performance in highly domain-spefific applications.
+In many cases, we can clearly say that a domain-specific CNN is better suited for inferencing certain types of images, but we cannot make a generalized statement that this is always the case.  However, a takeaway recommendation is that *it can make a difference*, and if one plans to use SR techniques for a very specific application, it does make sense to take the subject matter of the data into account during the training phase, simply using a pre-trained open-source SR model may not give the best performance in highly domain-specific applications.
 
 ---
 
