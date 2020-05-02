@@ -1,3 +1,10 @@
+#
+# Dataset loader file for UW Madison CS766 Project, Mar 2020
+# Eric Brandt, Asher Elmquist
+#
+#
+
+
 import numpy as np
 import torch
 import torch.utils.data
@@ -7,7 +14,6 @@ import matplotlib.pyplot as plt
 import random
 
 class Img2ImgJITLoader(torch.utils.data.Dataset):
-
     def __init__(self,x_dir,y_dir,file_type=".png",paired_samples=True,num_samples=-1):
         self.paired_samples = paired_samples
 
@@ -20,8 +26,6 @@ class Img2ImgJITLoader(torch.utils.data.Dataset):
         for f in self.img_list_x:
             file_name = f.split("/")[len(f.split("/"))-1]
             self.img_list_y.append(y_dir+file_name)
-
-        # self.img_list_y = glob.glob(y_dir+"*"+file_type)
 
         self.data_len = min(len(self.img_list_x),len(self.img_list_y))
 
