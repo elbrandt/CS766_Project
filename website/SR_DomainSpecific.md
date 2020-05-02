@@ -22,6 +22,12 @@ After training and monitoring the progress of all four CNN models, we compared t
   <img src="images/results/domain_transfer.png">
 </p>
 
+### Observational Analysis
+
+These results suggest that certain types of images (Buildings) are generally better for training SR networks regardless of what the test data set will contain (the orange bar is higher across all domains). Conversely, it also seems apparent that certain domains of images respond better to SR inferencing than others (the 'Building' domain seems to perform better with any of the models than the other domains). 
+
+One could theorize that this might be due to architectural style photographs having more sharp edges which become highly pixelated at reduced resolutions and SR inferencing can restore this edge with high accuracy. Such edge recovery is not nearly as good with simple linear interpolation due to the blurring effect it induces. On the other hand, domains such as Food and Flowers characteristically have considerably more high frequency information in their high resolution images. This information is lost during downsampling, and it is much harder for a SR CNN to learn what might be missing during inferencing, making its inference less distinguished from simple linear interpolation. 
+
 ### Statistical Analysis
 
 We have shown in the [Objective Results](SR_Results.md#objective-performance-measure---ssim) section that the SSIM gain of SR images over baseline 'linear interpolation upscaling' images is statistically significant (p < 0.001).  
@@ -89,7 +95,7 @@ For example, in the first row, second column, we can conclude that the performan
 
 ###### Table: p-values of Domain-specific models inferencing on their own image types versus other image types
 
-In some cases, we can clearly say that a particular CNN is better suited for inferencing certain types of images, but we cannot make a generalized statement that this is always the case.  However, a takeaway recommendation is that *it can make a difference*, and if one planse to use SR techniques for a very specific application, it does make sense to take the subject matter of the data into account during the training phase, simply using a pre-trained open-source SR model may not give the best performance in highly domain-spefific applications.
+In many cases, we can clearly say that a domain-specific CNN is better suited for inferencing certain types of images, but we cannot make a generalized statement that this is always the case.  However, a takeaway recommendation is that *it can make a difference*, and if one planse to use SR techniques for a very specific application, it does make sense to take the subject matter of the data into account during the training phase, simply using a pre-trained open-source SR model may not give the best performance in highly domain-spefific applications.
 
 ---
 
