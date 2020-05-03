@@ -18,7 +18,7 @@ For subjective SR results of our network, we let the images speak for themselves
   <img src="images/results/subjective_compare_1x2.png">
 </center>
 
-(Sample images are from [Open Images Dataset V5](https://storage.googleapis.com/openimages/web/index.html), used under [Creative Commons License](https://creativecommons.org/licenses/))
+###### (Test images are from [Open Images Dataset V5](https://storage.googleapis.com/openimages/web/index.html), used under [Creative Commons License](https://creativecommons.org/licenses/))
 
 ## Objective Performance Measure - SSIM
 
@@ -32,6 +32,8 @@ This bar chart shows the SR Net's performance against 100 test images in each of
 <center>
   <img src="images/results/sr_performance.png">
 </center>
+
+###### Table: SR results as measured by Structural Similarity Index, normalized to upsampling=1.0. Each bar is the mean of 100 test images having the specified primary label
 
 ---
 
