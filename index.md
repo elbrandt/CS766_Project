@@ -23,4 +23,4 @@ The final project website can be found [here](https://elbrandt.github.io/CS766_P
 
 
 ## Final Video Presentation
-Todo: Due May 4, 2020
+The final video presentation can be found [here](https://uwmadison.box.com/s/vbl00cpxqu5vkb7e36ozsovg3gt0dm88).
