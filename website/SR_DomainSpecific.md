@@ -16,11 +16,15 @@ During training, the model was evaluated periodically to determine the (rough) o
   <img src="images/results/dog_training_epochs.png">
 </center>
 
+###### Table: Structural Similarity Indices, normalized to upsampling=1.0, for the network trained exclusively on Dog images, showing progress being made while training the network over an increasing number of epochs.
+
 After training and monitoring the progress of all four CNN models, we compared the four models by testing them on the four separate test data sets. The results are shown in the following chart:
 
 <center>
   <img src="images/results/domain_transfer.png">
 </center>
+
+###### Table: Structural Similarity Indices, normalized to upsampling=1.0, for networks trained exclusively on images of a particular type
 
 ### Observational Analysis
 
