@@ -14,7 +14,7 @@ The segmentation results were compared using segmentation on the high resolution
 | FCN       | 20.0%     | 25.8%   |
 | DeepLabV3 | 13.5%     | 26.4%   |
 
-There also seems not to be a strong correlation that would suggest an improvement in SSIM would lead to improvement in segmentation. The results of segementation vs SSIM are shown here:
+There also seems not to be a strong correlation that would suggest an improvement in SSIM would lead to improvement in segmentation. The results of segmentation vs SSIM are shown here:
 
 <center>
 <img src="images/segmentation/segment_vs_ssim.png" width="400">
@@ -35,7 +35,9 @@ Here are some interesting examples showing the results of segmentation. The prim
 <img src="images/segmentation/seg_24.png" width="400">
 <img src="images/segmentation/seg_41.png" width="400">
 </center>
+
 ---
 
 |Prev: [Domain Specific Training and Inferencing](SR_DomainSpecific.md) | Up: [Main](SR_Main.md) | Next: [Conclusion](SR_Conclusion.md) |
+
 Asher Elmquist (```amelmquist@wisc.edu```), Eric Brandt (```elbrandt@wisc.edu```) 2020

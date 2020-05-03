@@ -7,10 +7,10 @@ Eric Brandt (```elbrandt@wisc.edu```)
 
 ## Overview
 
-The purpose of this project is to explore and better understand image super-resolution. We begin by preparing a large, high resolution, labeled training data set annd then implementing and training a convolutional neural network for super-resolution based on the current state of the art literature. Our investigation set out to answer three questions:
+The purpose of this project is to explore and better understand image super-resolution. We begin by preparing a large, high resolution, labeled training data set and then implementing and training a convolutional neural network for super-resolution based on the current state of the art literature. Our investigation set out to answer three questions:
 1. Can we train a state-of-the-art CNN to produce Super Resolution images and how can we assess the performance?
-2. Does the the image domain (as identified by primary image label) of the training data make a difference in the training results? What about in the test images being inferenced to Super Resolution?
-3. Does applying Super Resolution inferences to low resolution images improve the accuracy of downstream processes such as image segmentation?
+2. Does the the image domain (as identified by primary image label) of the training data make a difference in the training results? What about in the test images being inferenced for Super Resolution?
+3. Does applying Super Resolution to low resolution images improve the accuracy of downstream processes such as image segmentation?
 
 ## Table of Contents
 - [Super Resolution Image Enhancement](#super-resolution-image-enhancement)
@@ -30,4 +30,4 @@ The purpose of this project is to explore and better understand image super-reso
 
 ---
 
-|Prev: [Main](SR_Main.md) | Up: [Main](SR_Main.md) | Next: [Introduction](SR_Introduction.md) |
+| Up: [Main](SR_Main.md) | Next: [Introduction](SR_Introduction.md) |
