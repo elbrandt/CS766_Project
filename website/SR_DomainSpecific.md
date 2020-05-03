@@ -101,6 +101,18 @@ For example, in the first row, second column, we can conclude that the performan
 
 In many cases, we can clearly say that a domain-specific CNN is better suited for inferencing certain types of images, but we cannot make a generalized statement that this is always the case.  However, a takeaway recommendation is that *it can make a difference*, and if one plans to use SR techniques for a very specific application, it does make sense to take the subject matter of the data into account during the training phase, simply using a pre-trained open-source SR model may not give the best performance in highly domain-specific applications.
 
+### Domain Specific vs. Aggregate Training
+
+The idea of domain specific training data is very relevant for applications having a very narrow problem domain, but what about broad Super Resolution applications that need to be expected to work on images of all types? How would the training results differ if instead of limiting the models' training to a specific image domain, we trained the Super Resolution network on all 75,000 of our training images without regard to the labels of those images?  While very time consuming to train on this many images, we ran 72 epochs of our full corpora of images and compared the results to our best models of domain-specific training. The results, evaluated on the same 400 test images, is shown below.
+
+<center>
+  <img src="images/results/domain_w_sr_all_72.png">
+</center>
+
+###### Table: Performance of all domain specific models and a model (sr_all_72, pink bar) containing all 75,000 training images
+
+Here we see the familiar mantra of ML: More data is better. When all data is used to train the network, the network performs better universally across all domains. For example, training the network on images of Dogs, Flowers, and Food did improve the network's ability to inference test images of Buildings versus the network trained only on building images.
+
 ---
 
 |Prev: [Inferencing Results](SR_Results.md) | Up: [Main](SR_Main.md) | Next: [SR and Image Segmentation](SR_Segmentation.md) |
