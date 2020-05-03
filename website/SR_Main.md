@@ -12,6 +12,8 @@ The purpose of this project is to explore and better understand image super-reso
 2. Does the the image domain (as identified by primary image label) of the training data make a difference in the training results? What about in the test images being inferenced for Super Resolution?
 3. Does applying Super Resolution to low resolution images improve the accuracy of downstream processes such as image segmentation?
 
+A five minute video summary of the project can be found [here](https://uwmadison.box.com/s/vbl00cpxqu5vkb7e36ozsovg3gt0dm88).
+
 ## Table of Contents
 - [Super Resolution Image Enhancement](#super-resolution-image-enhancement)
   - [Overview](#overview)
